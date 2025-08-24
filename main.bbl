@@ -1,0 +1,57 @@
+\begin{thebibliography}{10}
+\providecommand{\bibauthor}[1]{#1}
+\providecommand{\bibeditor}[1]{#1}
+\providecommand{\bibtranslator}[1]{#1}
+\providecommand{\bibtitle}[1]{#1}
+\providecommand{\bibbooktitle}[1]{#1}
+\providecommand{\bibjournal}[1]{#1}
+\providecommand{\bibmark}[1]{\mbox{#1}}
+\providecommand{\bibcountry}[1]{#1}
+\providecommand{\bibpatentid}[1]{#1}
+\providecommand{\bibedition}[1]{#1}
+\providecommand{\biborganization}[1]{#1}
+\providecommand{\bibaddress}[1]{#1}
+\providecommand{\bibpublisher}[1]{#1}
+\providecommand{\bibinstitution}[1]{#1}
+\providecommand{\bibschool}[1]{#1}
+\providecommand{\bibvolume}[1]{#1}
+\providecommand{\bibnumber}[1]{#1}
+\providecommand{\bibversion}[1]{#1}
+\providecommand{\bibpages}[1]{#1}
+\providecommand{\bibmodifydate}[1]{#1}
+\providecommand{\bibcitedate}[1]{#1}
+\providecommand{\bibyear}[1]{#1}
+\providecommand{\bibdate}[1]{#1}
+\providecommand{\biburl}[1]{\newline\url{#1}}
+
+\bibitem{fordAvailabilityGloballyDistributed2010}
+\bibauthor{Ford D\@, Labelle F\@, Popovici F~I, et~al}\@. \bibtitle{Availability in {{Globally Distributed Storage Systems}}}\bibmark{[C]} //\thinspace{}\bibbooktitle{9th {{USENIX}} Symposium on Operating Systems Design and Implementation ({{OSDI}} 10)}\@, \bibaddress{Vancouver, BC}\thinspace{}\textnormal{: }\bibpublisher{USENIX Association}\@, \bibyear{2010}\@.
+
+\bibitem{ghemawatGoogleFileSystem2003}
+\bibauthor{Ghemawat S\@, Gobioff H\@, Leung S-T}\@. \bibtitle{The {{Google File System}}}\bibmark{[C]} //\thinspace{}\bibbooktitle{Proceedings of the Nineteenth {{ACM}} Symposium on {{Operating}} Systems Principles}\@, \bibaddress{Bolton Landing NY USA}\thinspace{}\textnormal{: }\bibpublisher{ACM}\@, \bibyear{2003}\thinspace{}\textnormal{: }\bibpages{29\textnormal{-}43}\@.
+
+\bibitem{calderWindowsAzureStorage2011}
+\bibauthor{Calder B\@, Wang J\@, Ogus A, et~al}\@. \bibtitle{Windows {{Azure Storage}}: {{A Highly Available Cloud Storage Service}} with {{Strong Consistency}}}\bibmark{[C]} //\thinspace{}\bibbooktitle{Proceedings of the {{Twenty-Third ACM Symposium}} on {{Operating Systems Principles}}}\@, \bibaddress{Cascais Portugal}\thinspace{}\textnormal{: }\bibpublisher{ACM}\@, \bibyear{2011}\thinspace{}\textnormal{: }\bibpages{143\textnormal{-}157}\@.
+
+\bibitem{shvachkoHadoopDistributedFile2010}
+\bibauthor{Shvachko K\@, Kuang H\@, Radia S, et~al}\@. \bibtitle{The {{Hadoop Distributed File System}}}\bibmark{[C]} //\thinspace{}\bibbooktitle{2010 {{IEEE}} 26th {{Symposium}} on {{Mass Storage Systems}} and {{Technologies}} ({{MSST}})}\@, \bibaddress{Incline Village, NV, USA}\thinspace{}\textnormal{: }\bibpublisher{IEEE}\@, \bibyear{2010}\thinspace{}\textnormal{: }\bibpages{1\textnormal{-}10}\@.
+
+\bibitem{weilCephScalableHighPerformance2006}
+\bibauthor{Weil S~A\@, Brandt S~A\@, Miller E~L, et~al}\@. \bibtitle{Ceph: {{A Scalable}}, {{High-Performance Distributed File System}}}\bibmark{[C]} //\thinspace{}\bibbooktitle{7th {{USENIX}} Symposium on Operating Systems Design and Implementation ({{OSDI}} 06)}\@, \bibaddress{Seattle, WA}\thinspace{}\textnormal{: }\bibpublisher{USENIX Association}\@, \bibyear{2006}\@.
+
+\bibitem{reedPolynomialCodesCertain1960}
+\bibauthor{Reed I~S\@, Solomon G}\@. \bibtitle{Polynomial {{Codes Over Certain Finite Fields}}}\bibmark{[J]}\@. \bibjournal{Journal of the Society for Industrial and Applied Mathematics}\@, \bibyear{1960}\@, \bibvolume{8}\bibnumber{(2)}\thinspace{}\textnormal{: }\bibpages{300\textnormal{-}304}\@.
+
+\bibitem{lubyXORBasedErasureResilientCoding1995}
+\bibauthor{Luby M\@, Zuckermank D}\@. \bibtitle{An {{XOR-Based Erasure-Resilient Coding Scheme}}}\bibmark{[J]}\@. \bibjournal{Tech Report, Tech. Rep.}\@, \bibyear{1995}\@.
+
+\bibitem{wangFastAccelerationStrategies2025}
+\bibauthor{Wang W\@, Lyu M\@, Niu T, et~al}\@. \bibtitle{Fast {{Acceleration Strategies}} for {{XOR-Based Erasure Codes}}}\bibmark{[J]}\@. \bibjournal{IEEE Transactions on Computer-Aided Design of Integrated Circuits and Systems}\@, \bibyear{2025}\@, \bibvolume{44}\bibnumber{(1)}\thinspace{}\textnormal{: }\bibpages{331\textnormal{-}344}\@.
+
+\bibitem{gongZigzagDecodableCodes2017}
+\bibauthor{Gong X\@, Sung C~W}\@. \bibtitle{Zigzag {{Decodable}} Codes: {{Linear-time}} Erasure Codes with Applications to Data Storage}\bibmark{[J]}\@. \bibjournal{Journal of Computer and System Sciences}\@, \bibyear{2017}\@, \bibvolume{89}\thinspace{}\textnormal{: }\bibpages{190\textnormal{-}208}\@.
+
+\bibitem{fuTwotoneShiftXORStorage2021}
+\bibauthor{Fu X\@, Wu C\@, Guo Y, et~al}\@. \bibtitle{Two-Tone {{Shift-XOR Storage Codes}}}\bibmark{[C]} //\thinspace{}\bibbooktitle{2021 {{IEEE International Symposium}} on {{Information Theory}} ({{ISIT}})}\@, \bibaddress{Melbourne, Australia}\thinspace{}\textnormal{: }\bibpublisher{IEEE}\@, \bibyear{2021}\thinspace{}\textnormal{: }\bibpages{2996\textnormal{-}3001}\@.
+
+\end{thebibliography}

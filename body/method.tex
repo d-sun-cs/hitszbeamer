@@ -1,0 +1,91 @@
+\begin{frame}{研究方案}
+    \begin{block}{课题主要内容}
+        研究Two-tone移位异或纠删码的高效实现，将其以插件形式集成至Ceph分布式存储系统，提出系统级优化方法，提升编解码性能。
+    \end{block}
+\end{frame}
+
+\begin{frame}{面临的挑战}
+    \begin{block}{面临的挑战}
+        \begin{itemize}
+            \item 如何统一处理所有丢失情况，实现解码和重编码的泛化。
+            \item 如何提升缓存局部性，减少内存访问压力。
+            \item 如何针对单块丢失场景特化优化。
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}{拟采用的方法}
+    \begin{block}{拟采用的方法}
+        \begin{itemize}
+            \item 统一解码抽象（Erasure-Parity Mapping）
+            \item 缓存友好窗口划分（Cache-Friendly Window）
+            \item 内存友好相邻合并访问（Neighbor-Merging Access）
+            \item 特化优化（Special Case Expansibility）
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}{RS码编码与解码举例}
+    \begin{figure}
+        \includegraphics[width=0.7\linewidth]{RS码编码举例.pdf}
+        \caption{RS码编码举例}
+    \end{figure}
+    \begin{figure}
+        \includegraphics[width=0.7\linewidth]{RS码解码举例.pdf}
+        \caption{RS码解码举例}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Two-tone码编码与解码举例}
+    \begin{figure}
+        \includegraphics[width=0.7\linewidth]{Two-tone码编码举例.pdf}
+        \caption{Two-tone码编码举例}
+    \end{figure}
+    \begin{figure}
+        \includegraphics[width=0.7\linewidth]{Two-tone码丢失3个数据块的解码举例.pdf}
+        \caption{Two-tone码丢失3个数据块的解码举例}
+    \end{figure}
+    \begin{figure}
+        \includegraphics[width=0.7\linewidth]{Two-tone码丢失2个数据块和1个校验块的解码举例.pdf}
+        \caption{Two-tone码丢失2个数据块和1个校验块的解码举例}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Two-tone码解码流程}
+    \begin{columns}
+        \begin{column}{.5\linewidth}
+            \begin{figure}
+                \includegraphics[width=0.2\linewidth]{Two-tone一般解码实现流程}
+                \caption{Two-tone一般解码实现流程}
+            \end{figure}
+        \end{column}
+        \begin{column}{.5\linewidth}
+            \begin{figure}
+                \includegraphics[width=0.2\linewidth]{Erasure-Parity Mapping统一解码实现流程}
+                \caption{Erasure-Parity Mapping统一解码实现流程}
+            \end{figure}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{优化方法与效果演示}
+    \begin{figure}
+        \includegraphics[width=0.7\linewidth]{Cache-Friendly Window效果演示}
+        \caption{Cache-Friendly Window效果演示}
+    \end{figure}
+    \begin{figure}
+        \includegraphics[width=0.7\linewidth]{Two-tone编码横向与纵向访问模式}
+        \caption{Two-tone编码横向与纵向访问模式}
+    \end{figure}
+    \begin{figure}
+        \includegraphics[width=0.7\linewidth]{Neighbor-Merging Access模式}
+        \caption{Neighbor-Merging Access模式}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{特化优化举例}
+    \begin{figure}
+        \includegraphics[width=0.7\linewidth]{Two-tone解码只丢失一块的特化情况举例}
+        \caption{Two-tone解码只丢失一块的特化情况举例}
+    \end{figure}
+\end{frame}

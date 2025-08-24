@@ -1,0 +1,30 @@
+\begin{frame}{目标与进度}
+  \begin{block}{课题预期目标}
+    将Two-tone移位异或纠删码以插件形式集成至Ceph分布式存储系统，推动新型高效纠删码技术在真实生产环境中的落地应用。实现接口集成与功能验证、集群集成与应用验证，并通过系统级优化提升编解码吞吐量。
+  \end{block}
+  \begin{block}{当前工作}
+    \begin{itemize}
+      \item 梳理并总结国内外纠删码相关理论与系统优化方法，完成文献调研。
+      \item 分析Two-tone移位异或纠删码的算法原理，明确优化方向与技术难点。
+      \item 初步设计Two-tone编码与解码的统一抽象结构，完成部分解码泛化功能的代码。
+      \item 搭建Ceph分布式存储系统的测试环境，集成最简单的Two-tone算法实现作为插件，成功通过Ceph的纠删码接口测试。
+    \end{itemize}
+  \end{block}
+  \begin{block}{进度安排}
+    \begin{enumerate}
+      \item \textbf{2025.09-2025.10}：继续深入调研相关文献，完善算法理论分析，尝试并明确优化方案。
+      \item \textbf{2025.10-2026.03}：完整集成Two-tone纠删码插件至Ceph中，完成Two-tone编码与解码算法的高效实现，应用所有优化方案，做消融实验证明各方案有效性，做对比实验证明相较于其他纠删码的高效性。
+      \item \textbf{2026.03-2026.05}：总结各优化方法论，总结实验成果，撰写论文。
+    \end{enumerate}
+    \textbf{实验条件与经费保障：} 实验室有单台服务器，具备1TB NVMe磁盘，可运行Ceph测试集群，无需额外经费。
+    \textbf{预计困难与解决方案：}
+    \begin{itemize}
+      \item Ceph接口复杂，集群环境搭建难度大，内存管理需特殊处理。
+      \item 解决方案包括借鉴现有插件实现、利用容器环境、部分元数据存储于Redis、采用抽象结构优化内存访问。
+    \end{itemize}
+  \end{block}
+%   \begin{figure}
+%     \includegraphics[width=0.5\linewidth]{progress_fig}
+%     \caption{课题进度安排示意图}
+%   \end{figure}
+\end{frame}

@@ -25,6 +25,8 @@
 % 设置文档类别为 <beamer>，<compress>选项含义为尽量压缩导航栏
 \documentclass[compress]{beamer}
 
+\PassOptionsToPackage{numbers, square, sort&compress}{natbib} % 解决 Package natbib Error: Bibliography not compatible with author-year citations
+
 % 使用 <hitszbeamer> 主题
 \usetheme{hitszbeamer}
 
@@ -35,7 +37,7 @@
 \graphicspath{{figures/}}
 
 % 封面信息
-\title[报告标题]{报告标题\\[2mm] 中期答辩}
+\title[报告标题]{报告标题\\[2mm] 开题报告}
 \author[杨敬轩]{学生：杨敬轩\\[5mm] 导师：XX\ 教授}
 \institute[哈尔滨工业大学（深圳）]{\small  哈尔滨工业大学（深圳）}
 \date{\small \vskip -10pt \today}
@@ -52,40 +54,39 @@
   \tableofcontents[hideallsubsections]
 }
 
-\section{研究内容及进度}
+% 背景动机
+\input{body/background.tex}
 
-\subsection{课题主要研究内容}
+% 文献综述
+\section{文献综述}
+\input{body/literature.tex}
 
-\begin{frame}{课题主要研究内容}
-  \begin{figure}
-    \includegraphics[width=0.6\linewidth]{hitlogo}
-    \caption{课题主要研究内容}
-  \end{figure}
+% 研究方案
+\section{研究方案}
+\input{body/method.tex}
+
+% 目标进度
+\section{目标进度}
+\input{body/progress.tex}
+
+% 参考文献
+\bibliographystyle{hitszbeamer}
+\begin{frame}[allowframebreaks]{参考文献}
+  \bibliography{reference}
 \end{frame}
 
-\subsection{进度介绍}
-
-\begin{frame}{进度介绍}
-  \begin{figure}
-    \includegraphics[width=0.6\linewidth]{hitlogo}
-    \caption{进度介绍}
-  \end{figure}
+% Q&A
+\section{Q\&A}
+\begin{frame}{\secname~ }
+	\begin{center}
+ 		\huge {That's all. Thank you!}\\
+		\vspace{1cm}
+		\huge {Q\&A}
+	\end{center}
 \end{frame}
 
-\section{研究工作及成果}
-
-\begin{frame}{已完成的研究工作及成果}
-  \begin{block}{已完成的研究工作简介}
-    \begin{itemize}
-      \setlength{\itemsep}{6pt}
-      \item XXXX
-      \item XXXX
-      \item XXXX
-      \item XXXX
-      \item XXXX
-      \item XXXX
-    \end{itemize}
-  \end{block}
+% 结束文档撰写
+\end{document}
 \end{frame}
 
 \subsection{研究工作一}
