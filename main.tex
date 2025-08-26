@@ -23,22 +23,40 @@
 %%=======================================================================
 
 % 设置文档类别为 <beamer>，<compress>选项含义为尽量压缩导航栏
-\documentclass[compress]{beamer}
+% 添加aspectratio设置成16:9
+\documentclass[compress, aspectratio=169]{beamer}
+% \documentclass[compress]{beamer}
 
 \PassOptionsToPackage{numbers, square, sort&compress}{natbib} % 解决 Package natbib Error: Bibliography not compatible with author-year citations
 
 % 使用 <hitszbeamer> 主题
 \usetheme{hitszbeamer}
 
+\usepackage{custom}
+
+
+% \setbeamercolor{sidebar}{bg=red}
+
+
+
+\AtBeginSection[] 
+{
+  \begin{frame}
+    \frametitle{目录}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
 % 开始写文章
 \begin{document}
+
 
 % 图片存放路径
 \graphicspath{{figures/}}
 
 % 封面信息
-\title[报告标题]{报告标题\\[2mm] 开题报告}
-\author[杨敬轩]{学生：杨敬轩\\[5mm] 导师：XX\ 教授}
+\title[Two-tone 移位异或纠删码的高效实现研究]{报告标题\\[2mm] 开题报告}
+\author[孙铎]{学生：孙铎\\[5mm] 导师：王强\ 副教授}
 \institute[哈尔滨工业大学（深圳）]{\small  哈尔滨工业大学（深圳）}
 \date{\small \vskip -10pt \today}
 
@@ -48,11 +66,11 @@
 \end{frame}
 
 % 目录页
-\section*{目录}
-\frame{
-  \frametitle{\secname}
-  \tableofcontents[hideallsubsections]
-}
+% \section*{目录}
+% \frame{
+%   \frametitle{\secname}
+%   \tableofcontents[hideallsubsections]
+% }
 
 % 背景动机
 \input{body/background.tex}

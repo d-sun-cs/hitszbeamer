@@ -1,7 +1,0 @@
-\beamer@sectionintoc {2}{背景动机}{3}{0}{1}
-\beamer@subsectionintoc {2}{1}{课题来源}{3}{0}{1}
-\beamer@subsectionintoc {2}{2}{目的与意义}{4}{0}{1}
-\beamer@sectionintoc {3}{文献综述}{5}{0}{2}
-\beamer@sectionintoc {4}{研究方案}{6}{0}{3}
-\beamer@sectionintoc {5}{目标进度}{14}{0}{4}
-\beamer@sectionintoc {7}{Q\&A}{19}{0}{5}
