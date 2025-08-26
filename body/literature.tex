@@ -1,14 +1,49 @@
-\begin{frame}{文献综述}
-    \begin{block}{国内外研究现状}
-        纠删码作为分布式存储系统的核心技术，传统RS码\cite{reedPolynomialCodesCertain1960}具有良好的MDS特性。为提升效率，研究者提出了异或优化\cite{lubyXORBasedErasureResilientCoding1995}、矩阵结构优化\cite{wangFastAccelerationStrategies2025}等方法。近年来，移位异或码如ZigZag\cite{gongZigzagDecodableCodes2017}和Two-tone\cite{fuTwotoneShiftXORStorage2021}成为新热点，具备更高的编解码性能。
-    \end{block}
-    \begin{block}{主要参考文献}
-        \begin{itemize}
-            \item Reed和Solomon（1960）提出了RS码\cite{reedPolynomialCodesCertain1960}。
-            \item Luby等（1995）提出异或优化\cite{lubyXORBasedErasureResilientCoding1995}。
-            \item Gong等（2017）提出ZigZag码\cite{gongZigzagDecodableCodes2017}。
-            \item Fu等（2021）提出Two-tone码\cite{fuTwotoneShiftXORStorage2021}。
-            \item Wang等（2025）提出Cerasure系统优化\cite{wangFastAccelerationStrategies2025}。
-        \end{itemize}
-    \end{block}
+\section{国内外研究现状及分析}
+
+\begin{frame}{国内外研究现状及分析}
+    \textbf{RS码理论研究综述：早期奠定基础的编解码理论}
+    
+    \vspace{0.5em}
+
+    \begin{enumerate}
+        \item 由Reed和Solomon提出\cite{reedPolynomialCodesCertain1960}，基于有限域Vandermonde矩阵乘法。
+        \item Luby等人将乘法变换为异或，并使用求逆更快的Cauchy矩阵\cite{lubyXORBasedErasureResilientCoding1995}。
+    \end{enumerate}
+    
+    这种理论最优的RS码是后续优化研究的基础。
+
+    \vspace{0.5em}
+
+    \textbf{RS码优化研究综述：重点研究工作及其优化方案总结}
+    
+    \vspace{0.5em}
+
+    \begin{table}[]
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+    减少矩阵中$1$的个数进而减少运算 & Zerasure\cite{zhouFastErasureCoding2020}、Cerasure\cite{wangFastAccelerationStrategies2025} \\ \hline
+    提取并复用公共异或运算表达式    & SLPEC\cite{uezatoAcceleratingXORbasedErasure2021}、Cerasure                                 \\ \hline
+    内存与缓存访问优化  & Zerasure、SLPEC、Cerasure \\ \hline
+    降低数据指针相关开销 & Cerasure                \\ \hline
+    \end{tabular}
+    \end{table}
+
+    Cerasure综合各优化策略，并提出指针开销优化，是RS码SOTA实现。
+
+\end{frame}
+
+\begin{frame}{国内外研究现状及分析}
+
+    \textbf{移位异或纠删码理论研究综述：从ZigZag到Two-tone}
+    
+    \vspace{1em}
+
+    \begin{columns}[t]
+        \column{0.5\textwidth}
+        ZigZag Decodable Codes\cite{gongZigzagDecodableCodes2017}是较早提出的移位异或纠删码，通过构建特殊的移位矩阵实现了仅依赖异或和移位的高效编解码
+        \column{0.5\textwidth}
+        twotone
+    \end{columns}
+    
 \end{frame}

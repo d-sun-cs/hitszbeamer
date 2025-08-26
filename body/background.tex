@@ -1,23 +1,117 @@
-\section{课题的来源及研究目的和意义}
+\section{课题来源及研究目的和意义}
+
 \subsection{课题来源}
-\begin{frame}{课题来源}
-    \begin{columns}
-        \begin{column}{.5\linewidth}
-            1/3
+
+\begin{frame}{课题的来源及研究目的和意义}{课题来源}
+
+    \begin{columns}[T]
+
+        \begin{column}{0.5\textwidth}
+
+            \textbf{存储系统的数据可靠性}
+
+            \vspace{1em}
+
+            多副本：实现简单、存储开销翻倍
+
+            纠删码：
+            \begin{itemize}
+                \item 计算复杂，存储开销更小
+                \item 可靠性更高\cite{weatherspoonErasureCodingVs2002}
+            \end{itemize}
+
+            Google FS、Win Azure和Red Hat开源Ceph等存储系统均支持纠删码
+
         \end{column}
-        \begin{column}{.5\linewidth}
-            2/3
+        \begin{column}{0.5\textwidth}
+
+            \textbf{经典纠删码}
+
+            \vspace{1em}
+
+            Reed-Solomon码（RS码）\cite{reedPolynomialCodesCertain1960}：
+            \begin{itemize}
+                \item 基于有限域$GF[2^w]$矩阵乘法
+                \item 可部分转换为异或运算\cite{lubyXORBasedErasureResilientCoding1995}
+            \end{itemize}
+
+            Jerasure\cite{plankJerasureLibraryFacilitating2008}、Intel ISA\cite{gajalwarExploringDataProtection2024}等RS码的优化库在工业级存储系统中应用广泛
+
+        \end{column}
+
+    \end{columns}
+
+\end{frame}
+
+\begin{frame}{课题的来源及研究目的和意义}{课题来源}
+
+    \begin{columns}[T]
+
+        \begin{column}{0.5\textwidth}
+
+            \textbf{非循环移位异或纠删码}
+
+            \vspace{1em}
+
+            Two-tone Shift-XOR Codes\cite{fuTwotoneShiftXORStorage2021}：
+            \begin{itemize}
+                \item 基于非循环移位和异或运算
+                \item 理论性能优于经典RS码\cite{gongZigzagDecodableCodes2017}
+                \item 暂无实现层面的优化研究
+            \end{itemize}
+
+            % \begin{block}{非循环移位异或纠删码}
+            %     Two-tone Shift-XOR Codes\cite{fuTwotoneShiftXORStorage2021}：
+            %     \begin{itemize}
+            %         \item 基于非循环移位和异或运算
+            %         \item 理论性能优于经典RS码\cite{gongZigzagDecodableCodes2017}
+            %         \item 暂无实现层面的优化研究
+            %     \end{itemize}
+            % \end{block}
+
+        \end{column}
+
+        \begin{column}{0.5\textwidth}
+
+            \textbf{工程实现与系统优化问题}
+
+            \vspace{1em}
+
+            \begin{itemize}
+                \item \emph{缺少泛化性实现}：单一的实现难以统一处理多种丢失情况
+                \item \textit{缺少系统级优化}：无法直接应用有限域矩阵乘法的优化策略
+                \item \textit{缺少工业级应用}：暂无集成至工业级存储系统的测试和应用
+            \end{itemize}
+
+            % \begin{block}{工程实现与系统优化问题}
+            %     \begin{itemize}
+            %         \item \textit{缺少泛化性实现}：单一的实现难以统一处理多种丢失情况
+            %         \item \textit{缺少系统级优化}：无法直接应用有限域矩阵乘法的优化策略
+            %         \item \textit{缺少工业级应用}：暂无集成至工业级存储系统的测试和应用
+            %     \end{itemize}
+            % \end{block}
+
         \end{column}
     \end{columns}
-    
-%   \begin{block}{来源}
-    随着分布式存储系统的发展，数据可用性成为应对故障的关键\cite{fordAvailabilityGloballyDistributed2010}。主流容错技术包括数据复制和纠删码。纠删码以更低的存储成本提供高可靠性，已广泛应用于Google文件系统\cite{ghemawatGoogleFileSystem2003}、Windows Azure\cite{calderWindowsAzureStorage2011}、Hadoop\cite{shvachkoHadoopDistributedFile2010}和Ceph\cite{weilCephScalableHighPerformance2006}等系统。
-%   \end{block}
 \end{frame}
 
 \subsection{研究的目的和意义}
-\begin{frame}{背景动机 - 目的与意义}
-% \begin{block}{研究目的与意义}
-    本课题旨在设计并优化高效的Two-tone移位异或纠删码实现方案，推动新型纠删码在分布式存储系统中的落地应用，实现比现有SOTA纠删码更高效的性能。研究意义在于提升编解码吞吐量，推动移位异或纠删码从理论到实际应用，填补系统级优化方法论的空白。
-%   \end{block}
+
+\begin{frame}{课题的来源及研究目的和意义}{研究的目的和意义}
+
+    \begin{block}{研究目的}
+        \begin{itemize}
+            \item 集成Two-tone纠删码至开源分布式存储系统Ceph，完善其功能
+            \item 尝试各种系统级优化方案，取得更高的纠删码吞吐性能
+        \end{itemize}
+    
+    \end{block}
+
+    \begin{block}{研究意义}
+        \begin{itemize}
+            \item 推动移位异或纠删码从算法理论到实际应用，实现更高效的纠删码
+            \item 填补位异或纠删码缺少系统级优化的空白，对齐RS码的优化研究
+        \end{itemize}
+    \end{block}
+
 \end{frame}

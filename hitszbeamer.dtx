@@ -503,15 +503,17 @@ This package consists of the file  hitszbeamer.dtx,
 \mode<presentation>
 
 % 插入透明的logo
-\pgfdeclaremask{figmask}{figures/hitlogo-mask.jpg}
-\pgfdeclareimage[mask=figmask,width=0.17\linewidth,interpolate=true]{hitlogomasked}{figures/hitlogo.jpg}
-\logo{\pgfuseimage{hitlogomasked}}
+% \pgfdeclaremask{figmask}{figures/hitlogo-mask.jpg}
+% \pgfdeclareimage[mask=figmask,width=0.17\linewidth,% rpolate=true]{hitlogomasked}{figures/hitlogo.jpg}
+% \logo{\pgfuseimage{hitlogomasked}}
+% xelatex编译时只能用抠好的图片
+\logo{\includegraphics[width=0.1\linewidth]{figures/hitlogocutout.png}}
 
 % 取消导航符号
 \setbeamertemplate{navigation symbols}{}
 
 % 使用<sidebar>主题
-\useoutertheme[width=0.17\linewidth]{sidebar}
+\useoutertheme[width=0.20\linewidth]{sidebar}
 
 \mode<all>
 %</hitszouterstyle>
