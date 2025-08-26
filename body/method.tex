@@ -1,5 +1,68 @@
 \section{主要研究内容及研究方案}
 \subsection{研究内容}
+
+\begin{frame}{主要研究内容及研究方案}{研究内容}
+
+    \textbf{存储编码的基本原理}
+
+    \begin{columns}
+
+        \column{0.5\textwidth}
+
+        \begin{block}{RS纠删码编码}
+            \footnotesize
+            \begin{itemize}
+                \item $C$：原始数据块向量
+                \item $G$：生成矩阵（Vandermonde/Cauchy）
+                \item $C$：编码后的校验块向量
+            \end{itemize}
+            $$\mathbf{C} = \mathbf{G} \times_{GF[2^w]} \mathbf{D}$$
+            原始数据均分成$k$块，通过有限域矩阵乘法编码出$m$块，共$n=k+m$块存储至$n$台机器，至多容忍$m$台故障
+        \end{block}
+
+        \column{0.5\textwidth}
+
+        \begin{figure}[htbp]
+            \centering
+            \includegraphics[width=1.05\textwidth]{figures/RS码编码举例.pdf}
+            \caption{RS码编码举例}
+        \end{figure}
+
+    \end{columns}
+    
+\end{frame}
+
+\begin{frame}{主要研究内容及研究方案}{研究内容}
+
+    \textbf{存储编码的基本原理}
+
+    \begin{columns}
+
+        \column{0.5\textwidth}
+
+        \begin{block}{RS纠删码解码}
+            \footnotesize
+            \begin{itemize}
+                \item $D'$：未丢失数据/校验块构成的向量
+                \item $G'^{-1}$：由丢失情况构造的逆生成矩阵
+                \item $D$：解出的原始数据块向量
+            \end{itemize}
+            $$\mathbf{D} = \mathbf{G'}^{-1} \times_{GF[2^w]} \mathbf{D'}$$
+            原始数据均分成$k$块，通过有限域矩阵乘法编码出$m$块，共$n=k+m$块存储至$n$台机器，至多容忍$m$台故障
+        \end{block}
+
+        \column{0.5\textwidth}
+
+        \begin{figure}[htbp]
+            \centering
+            \includegraphics[width=1.05\textwidth]{figures/RS码编码举例.pdf}
+            \caption{RS码编码举例}
+        \end{figure}
+
+    \end{columns}
+
+\end{frame}
+
 \subsection{研究方案}
 \begin{frame}{研究方案}
     \begin{block}{课题主要内容}

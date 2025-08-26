@@ -10,7 +10,7 @@
         \item Luby等人将乘法变换为异或，并使用求逆更快的Cauchy矩阵\cite{lubyXORBasedErasureResilientCoding1995}。
     \end{enumerate}
     
-    这种理论最优的RS码是后续优化研究的基础。
+    这种变换的RS码是目前理论最优的，也是后续实现层面优化的基础。
 
     \vspace{0.5em}
 
@@ -38,12 +38,11 @@
     \textbf{移位异或纠删码理论研究综述：从ZigZag到Two-tone}
     
     \vspace{1em}
+            
+    ZigZag Decodable Codes（ZD码）\cite{gongZigzagDecodableCodes2017}是较早提出的移位异或纠删码，通过移位矩阵编解码，取得比RS码更少的计算量和更高的性能，并在存储、密码学、网络等领域拓展应用。
 
-    \begin{columns}[t]
-        \column{0.5\textwidth}
-        ZigZag Decodable Codes\cite{gongZigzagDecodableCodes2017}是较早提出的移位异或纠删码，通过构建特殊的移位矩阵实现了仅依赖异或和移位的高效编解码
-        \column{0.5\textwidth}
-        twotone
-    \end{columns}
-    
+    \vspace{0.5em}
+
+    Two-tone Shift-XOR Codes\cite{fuTwotoneShiftXORStorage2021}在ZD码基础上，提出改进的递增差（RID）性质\cite{fuDecodingRepairSchemes2020}、连续可解性理论\cite{chengSuccessivelySolvableShiftAdd2021}，与双子系统移位异或消除法\cite{fuTwotoneShiftXORStorage2021}，得到比ZD码更规范高效的移位异或纠删码。
+        
 \end{frame}
