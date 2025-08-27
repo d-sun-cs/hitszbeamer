@@ -1,9 +1,9 @@
 \section{主要研究内容及研究方案}
 \subsection{研究内容}
 
-\begin{frame}{主要研究内容及研究方案}{研究内容}
+\begin{frame}{主要研究内容及研究方案}{研究内容 - 存储编码的基本原理}
 
-    \textbf{存储编码的基本原理}
+    % \textbf{存储编码的基本原理}
 
     \begin{columns}
 
@@ -12,7 +12,7 @@
         \begin{block}{RS纠删码编码}
             \footnotesize
             \begin{itemize}
-                \item $C$：原始数据块向量
+                \item $D$：原始数据块向量
                 \item $G$：生成矩阵（Vandermonde/Cauchy）
                 \item $C$：编码后的校验块向量
             \end{itemize}
@@ -32,9 +32,9 @@
     
 \end{frame}
 
-\begin{frame}{主要研究内容及研究方案}{研究内容}
+\begin{frame}{主要研究内容及研究方案}{研究内容 - 存储编码的基本原理}
 
-    \textbf{存储编码的基本原理}
+    % \textbf{存储编码的基本原理}
 
     \begin{columns}
 
@@ -48,26 +48,149 @@
                 \item $D$：解出的原始数据块向量
             \end{itemize}
             $$\mathbf{D} = \mathbf{G'}^{-1} \times_{GF[2^w]} \mathbf{D'}$$
-            原始数据均分成$k$块，通过有限域矩阵乘法编码出$m$块，共$n=k+m$块存储至$n$台机器，至多容忍$m$台故障
         \end{block}
 
         \column{0.5\textwidth}
 
-        \begin{figure}[htbp]
+        \begin{figure}[T]
             \centering
-            \includegraphics[width=1.05\textwidth]{figures/RS码编码举例.pdf}
-            \caption{RS码编码举例}
+            \includegraphics[width=0.85\textwidth]{figures/RS码解码举例.pdf}
+            \caption{RS码解码举例}
         \end{figure}
 
     \end{columns}
 
 \end{frame}
 
-\subsection{研究方案}
-\begin{frame}{研究方案}
-    \begin{block}{课题主要内容}
-        研究Two-tone移位异或纠删码的高效实现，将其以插件形式集成至Ceph分布式存储系统，提出系统级优化方法，提升编解码性能。
+\begin{frame}{主要研究内容及研究方案}{研究内容 - Two-tone编解码原理}
+
+    \begin{columns}
+
+        \column{0.5\textwidth}
+
+        \begin{block}{Two-tone纠删码编码}
+            \footnotesize
+            \begin{itemize}
+                \item $D$：原始数据块向量
+                \item $Z$：移位生成矩阵（Two-tone矩阵）
+                \item $C$：编码后的校验块向量
+            \end{itemize}
+            $$\mathbf{C} = \mathbf{Z} \times \mathbf{D}$$
+            \vspace{-1.5em}
+            \begin{itemize}
+                \item $D=\{D_1, D_2, \dots, D_k\}$
+                \item $C=\{C_1, C_2, \dots, C_m\}$
+                \item $z^{s_{ij}}D_j$：对$D_j$非循环移位$s_{i,j}$个单位
+            \end{itemize}
+            $$C_i = \bigoplus_{j=1}^{k} z^{s_{ij}}D_j$$
+        \end{block}
+
+        \column{0.5\textwidth}
+
+        \begin{figure}[T]
+            \centering
+            \includegraphics[width=0.9\textwidth]{Two-tone码编码举例}
+            \caption{Two-tone码编码举例}
+        \end{figure}
+
+    \end{columns}
+
+\end{frame}
+
+\begin{frame}{主要研究内容及研究方案}{研究内容 - Two-tone编解码原理}
+
+    \begin{columns}
+
+        \column{0.5\textwidth}
+
+        \vspace{-2em}
+
+        \begin{block}{Two-tone纠删码解码}
+            \footnotesize
+            \begin{enumerate}
+                \item 代入：将未丢失数据块异或至校验块
+                \item 消除：从两边最外侧错开码字依次向内解出（对应双子系统），并代入校验块
+            \end{enumerate}
+        \end{block}
+
+        \column{0.5\textwidth}
+
+        \begin{figure}[T]
+            \centering
+            \includegraphics[width=0.95\textwidth]{Two-tone码丢失3个数据块的解码举例}
+            \caption{Two-tone丢失3个数据块的解码}
+        \end{figure}
+
+    \end{columns}
+
+\end{frame}
+
+\begin{frame}{主要研究内容及研究方案}{研究内容 - Two-tone编解码原理}
+
+
+    \begin{columns}
+
+        \column{0.5\textwidth}
+
+        \vspace{-1.5em}
+
+        \begin{block}{Two-tone纠删码解码}
+            \footnotesize
+            \begin{enumerate}
+                \item 代入：将未丢失数据块异或至校验块
+                \item 消除：从一边最外侧错位向内解码（另一边对应子系统为空），并代入校验块
+                \item 重编码：用未丢失和刚解出的数据块重新编码丢失的校验块
+            \end{enumerate}
+        \end{block}
+
+        \column{0.5\textwidth}
+
+        \vspace{-1em}
+
+        \begin{figure}[T]
+            \centering
+            \includegraphics[width=0.78\textwidth]{Two-tone码丢失2个数据块和1个校验块的解码举例}
+            \caption{丢失2数据块1校验块解码}
+        \end{figure}
+
+    \end{columns}
+
+\end{frame}
+
+\begin{frame}{主要研究内容及研究方案}{研究内容 - 优化问题描述}
+
+    \begin{block}{优化问题描述}
+        Two-tone纠删码在理论上具备高效性，但工程实现与优化仍面临问题：
+        \begin{itemize}
+            \item 如何统一处理所有丢失情况，实现解码和重编码的泛化，兼顾高效性
+            \item 如何提高对不同偏移量数据块和校验块的访问效率，缓解内存瓶颈
+            \item 如何针对只丢失一块的常见场景进一步优化，发挥硬件指令优势
+        \end{itemize}
     \end{block}
+    基于以上理论和问题，本课题给出了一系列研究方案。
+\end{frame}
+
+\subsection{研究方案}
+
+\begin{frame}{主要研究内容及研究方案}{研究方案}
+    \setbeamerfont{caption}{size=\scriptsize}
+
+    \small
+    \begin{block}{统一解码抽象：Erasure-Parity Mapping}
+        \footnotesize
+        将所有丢失块的数据/校验块统一抽象为Erasure结构，丢失校验块匹配自己，丢失数据块按序匹配未丢失校验块
+    \end{block}
+    \begin{figure}
+        \includegraphics[width=0.9\linewidth]{Two-tone一般解码实现流程}
+        \vspace{-1em}
+        \caption{Two-tone一般解码实现流程}
+    \end{figure}
+    \vspace{-1em}
+    \begin{figure}
+        \includegraphics[width=0.9\linewidth]{Erasure-Parity Mapping统一解码实现流程}
+        \vspace{-1em}
+        \caption{Erasure-Parity Mapping统一解码实现流程}
+    \end{figure}
 \end{frame}
 
 \begin{frame}{面临的挑战}
