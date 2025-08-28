@@ -1,33 +1,67 @@
 \section{预期目标与进度安排}
 \subsection{预期目标}
+
+\begin{frame}{预期目标与进度安排}{预期目标}
+
+  \begin{block}{系统集成与应用目标}
+
+  \small
+  \begin{itemize}
+    \setlength{\itemsep}{1pt}
+    \item Two-tone纠删码插件化集成至Ceph分布式存储系统
+    \item 接口集成与功能验证：编码/解码正确性与性能测试
+    \item 集群集成与应用验证：在测试集群下的读写流程与稳定性
+  \end{itemize}
+
+  \end{block}
+
+  \begin{block}{性能优化与总结方法论目标}
+
+  \footnotesize
+  \begin{itemize}
+    \setlength{\itemsep}{1pt}
+    \item 实现提出的优化研究方案，总结移位异或纠删码系统级优化方法论
+    \vspace{-0.5em}
+    \begin{itemize}
+      \item 统一解码抽象：提升解码泛化能力与效率
+      \item 缓存友好窗口划分：优化数据块与校验块缓存局部性
+      \item 内存友好相邻合并访问：减少重复访问，提升编码效率
+      \item 特化优化：只丢失一块的场景下高效解码
+    \end{itemize}
+    \item 与Ceph中的SOTA纠删码ISA和学术研究SOTA纠删码Cerasure\cite{wangFastAccelerationStrategies2025}对比性能
+  \end{itemize}
+
+  \end{block}
+
+\end{frame}
+
 \subsection{已完成的研究工作及进度安排}
-\begin{frame}{预期目标与进度安排}
-  \begin{block}{课题预期目标}
-    将Two-tone移位异或纠删码以插件形式集成至Ceph分布式存储系统，推动新型高效纠删码技术在真实生产环境中的落地应用。实现接口集成与功能验证、集群集成与应用验证，并通过系统级优化提升编解码吞吐量。
+
+\begin{frame}{预期目标与进度安排}{已完成的研究工作及进度安排}
+
+  \begin{block}{已完成的研究工作}
+
+  \footnotesize
+  \begin{itemize}
+    \setlength{\itemsep}{2pt}
+    \item 梳理纠删码理论与系统优化方法，完成文献调研
+    \item 明确Two-tone移位异或纠删码优化方向与技术难点
+    \item 初步实现统一抽象结构，部分解码泛化功能
+    \item 搭建Ceph测试环境，集成Two-tone插件并通过接口测试
+  \end{itemize}
+
   \end{block}
-  \begin{block}{当前工作}
-    \begin{itemize}
-      \item 梳理并总结国内外纠删码相关理论与系统优化方法，完成文献调研。
-      \item 分析Two-tone移位异或纠删码的算法原理，明确优化方向与技术难点。
-      \item 初步设计Two-tone编码与解码的统一抽象结构，完成部分解码泛化功能的代码。
-      \item 搭建Ceph分布式存储系统的测试环境，集成最简单的Two-tone算法实现作为插件，成功通过Ceph的纠删码接口测试。
-    \end{itemize}
-  \end{block}
+
   \begin{block}{进度安排}
-    \begin{enumerate}
-      \item \textbf{2025.09-2025.10}：继续深入调研相关文献，完善算法理论分析，尝试并明确优化方案。
-      \item \textbf{2025.10-2026.03}：完整集成Two-tone纠删码插件至Ceph中，完成Two-tone编码与解码算法的高效实现，应用所有优化方案，做消融实验证明各方案有效性，做对比实验证明相较于其他纠删码的高效性。
-      \item \textbf{2026.03-2026.05}：总结各优化方法论，总结实验成果，撰写论文。
-    \end{enumerate}
-    \textbf{实验条件与经费保障：} 实验室有单台服务器，具备1TB NVMe磁盘，可运行Ceph测试集群，无需额外经费。
-    \textbf{预计困难与解决方案：}
-    \begin{itemize}
-      \item Ceph接口复杂，集群环境搭建难度大，内存管理需特殊处理。
-      \item 解决方案包括借鉴现有插件实现、利用容器环境、部分元数据存储于Redis、采用抽象结构优化内存访问。
-    \end{itemize}
+
+  \footnotesize
+  \begin{enumerate}
+    \setlength{\itemsep}{2pt}
+    \item \textbf{2025.09-2025.10}：进一步完善理论分析，明确优化方案，完善插件基本功能
+    \item \textbf{2025.10-2026.03}：对集成的Two-tone纠删码进行优化实现，完成消融与对比实验
+    \item \textbf{2026.03-2026.05}：总结方法论与实验成果，撰写论文
+  \end{enumerate}
+
   \end{block}
-%   \begin{figure}
-%     \includegraphics[width=0.5\linewidth]{progress_fig}
-%     \caption{课题进度安排示意图}
-%   \end{figure}
+
 \end{frame}
