@@ -26,7 +26,6 @@
 % 添加aspectratio设置成16:9
 \documentclass[compress, aspectratio=169]{beamer}
 % \documentclass[compress]{beamer}
-
 \PassOptionsToPackage{numbers, square, sort&compress}{natbib} % 解决 Package natbib Error: Bibliography not compatible with author-year citations
 
 % 使用 <hitszbeamer> 主题
@@ -54,7 +53,7 @@
 
 % 封面信息
 \title[移位异或纠删码的\\高效实现研究]{移位异或纠删码的高效实现研究\\[1mm] \small 开题报告\vspace{-0.7em}}
-\author[孙铎]{学生：孙铎 \\[1mm] 导师：王强\ 副教授 \\[1mm] 指导教师：王强\ 副教授、付希明\ 副教授}
+\author[孙铎]{学生：孙铎 \\[1mm] 导师：王强\ 副教授}
 \institute[哈尔滨工业大学（深圳）计算机科学与技术学院]{\small  哈尔滨工业大学（深圳）计算机科学与技术学院}
 \date{\small \vskip -10pt \today}
 
@@ -67,7 +66,7 @@
 \section*{目录}
 \frame{
   \frametitle{\secname}
-  \tableofcontents[hideallsubsections]
+  \tableofcontents[sections=all]
 }
 
 % 背景动机
@@ -82,8 +81,16 @@
 % 目标进度
 \input{body/progress.tex}
 
+% \section{参考文献}
+\bibliographystyle{hitszbeamer}
+\begin{frame}{参考文献}
+  \tiny
+  \setlength{\bibsep}{-0.5pt}
+  \bibliography{reference}
+\end{frame}
+
 % Q&A
-\section{Q\&A}
+% \section{Q\&A}
 \begin{frame}{\secname~ }
 	\begin{center}
  		\huge {感谢各位老师的耐心观看\\请老师批评指正}\\
@@ -92,11 +99,7 @@
 	\end{center}
 \end{frame}
 
-% 参考文献
-\bibliographystyle{hitszbeamer}
-\begin{frame}[allowframebreaks]{参考文献}
-  \bibliography{reference}
-\end{frame}
+
 
 % 结束文档撰写
 \end{document}
