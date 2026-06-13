@@ -1,67 +1,87 @@
-\section{预期目标与进度安排}
-\subsection{预期目标}
+\section{实验评估与结果}
 
-\begin{frame}{预期目标与进度安排}{预期目标}
+\begin{frame}{实验评估与结果}{编码与解码吞吐}
 
-  \begin{block}{系统集成与应用目标}
+    \footnotesize
+    环境：i9-14900K + AVX2、64\,GB DDR5、块2\,MB；基线：Jerasure、\textbf{ISA-L}（Ceph生产级）、\textbf{Cerasure}（学术SOTA）。
 
-  \small
-  \begin{itemize}
-    \setlength{\itemsep}{1pt}
-    \item Two-tone纠删码插件化集成至Ceph分布式存储系统
-    \item 接口集成与功能验证：编码/解码正确性与性能测试
-    \item 集群集成与应用验证：在测试集群下的读写流程与稳定性
-  \end{itemize}
+    \vspace{0.4em}
+    \begin{columns}[T]
+        \column{0.5\textwidth}
+        \begin{block}{编码吞吐（GB/s）}
+            \centering \scriptsize
+            \begin{tabular}{cccc}
+                \toprule
+                配置 & FastTT & ISA-L & Jera. \\
+                \midrule
+                (6, 2)  & \textbf{34.74} & 24.37 & 17.03 \\
+                (8, 3)  & \textbf{31.35} & 17.03 & 7.08  \\
+                (10, 4) & \textbf{17.59} & 13.56 & 4.58  \\
+                \bottomrule
+            \end{tabular}
+        \end{block}
+        \centering 相较ISA-L平均\textbf{+59.1\%}，Jerasure \textbf{+261\%}
 
-  \end{block}
+        \column{0.5\textwidth}
+        \begin{block}{解码吞吐（GB/s）}
+            \centering \scriptsize
+            \begin{tabular}{ccccc}
+                \toprule
+                配置 & 丢失 & FastTT & ISA-L & Jera. \\
+                \midrule
+                (6, 2)  & 1 & \textbf{95.99} & 38.38 & 42.70 \\
+                (8, 3)  & 1 & \textbf{93.11} & 33.01 & 37.04 \\
+                (8, 3)  & 3 & \textbf{21.44} & 18.38 & 5.00  \\
+                \bottomrule
+            \end{tabular}
+        \end{block}
+        \centering 相较ISA-L平均\textbf{+50.9\%}，单块丢失最高\textbf{+182\%}
+    \end{columns}
 
-  \begin{block}{性能优化与总结方法论目标}
-
-  \footnotesize
-  \begin{itemize}
-    \setlength{\itemsep}{1pt}
-    \item 实现提出的优化研究方案，总结移位异或纠删码系统级优化方法论
-    \vspace{-0.5em}
-    \begin{itemize}
-      \item 统一解码抽象：提升解码泛化能力与效率
-      \item 缓存友好窗口划分：优化数据块与校验块缓存局部性
-      \item 内存友好相邻合并访问：减少重复访问，提升编码效率
-      \item 特化优化：只丢失一块的场景下高效解码
-    \end{itemize}
-    \item 与Ceph中的SOTA纠删码ISA和学术研究SOTA纠删码Cerasure\cite{wangFastAccelerationStrategies2025}对比性能
-  \end{itemize}
-
-  \end{block}
+    \vspace{0.4em}
+    \centering 对比学术SOTA Cerasure：编码\textbf{+13.2\%}、解码\textbf{+16.0\%}（最高+43.6\%）。
 
 \end{frame}
 
-\subsection{已完成的研究工作及进度安排}
+\begin{frame}{实验评估与结果}{消融实验与端到端吞吐}
 
-\begin{frame}{预期目标与进度安排}{已完成的研究工作及进度安排}
+    \footnotesize
+    \begin{columns}[T]
+        \column{0.55\textwidth}
+        \begin{block}{消融实验 $(8,3)$（GB/s）}
+            \centering \scriptsize
+            \begin{tabular}{ccccrr}
+                \toprule
+                CFWP & NMA & EPM & TPS & 编码 & 解码 \\
+                \midrule
+                           &            &            &            & 13.16 & 7.54  \\
+                           &            & \checkmark &            & 13.16 & 16.85 \\
+                \checkmark &            & \checkmark &            & 23.32 & 24.10 \\
+                \checkmark & \checkmark & \checkmark &            & 31.23 & 24.10 \\
+                \checkmark & \checkmark & \checkmark & \checkmark & \textbf{32.78} & \textbf{35.23} \\
+                \bottomrule
+            \end{tabular}
+        \end{block}
+        \centering \scriptsize 四项优化针对不同瓶颈，贡献清晰且\textbf{可叠加}
 
-  \begin{block}{已完成的研究工作}
+        \column{0.45\textwidth}
+        \begin{block}{端到端 \emph{PUT} 吞吐（MB/s）}
+            \centering \scriptsize
+            \begin{tabular}{cccc}
+                \toprule
+                配置 & FastTT & ISA-L & Jera. \\
+                \midrule
+                (6, 2)  & \textbf{457.7} & 444.6 & 401.4 \\
+                (8, 3)  & \textbf{877.3} & 817.6 & 709.3 \\
+                (10, 4) & \textbf{573.0} & 546.4 & 490.1 \\
+                \bottomrule
+            \end{tabular}
+        \end{block}
+        \centering \scriptsize 含磁盘I/O仍\textbf{持续优于ISA-L}（平均+7.1\%）
+    \end{columns}
 
-  \footnotesize
-  \begin{itemize}
-    \setlength{\itemsep}{2pt}
-    \item 梳理纠删码理论与系统优化方法，完成文献调研
-    \item 明确Two-tone移位异或纠删码优化方向与技术难点
-    \item 初步实现统一抽象结构，部分解码泛化功能
-    \item 搭建Ceph测试环境，集成Two-tone插件并通过接口测试
-  \end{itemize}
-
-  \end{block}
-
-  \begin{block}{进度安排}
-
-  \footnotesize
-  \begin{enumerate}
-    \setlength{\itemsep}{2pt}
-    \item \textbf{2025.09-2025.10}：进一步完善理论分析，明确优化方案，完善插件基本功能
-    \item \textbf{2025.10-2026.03}：对集成的Two-tone纠删码进行优化实现，完成消融与对比实验
-    \item \textbf{2026.03-2026.05}：总结方法论与实验成果，撰写论文
-  \end{enumerate}
-
-  \end{block}
+    \vspace{0.5em}
+    \centering
+    \textbf{编/解码、消融与端到端实验全面验证优化有效性，达成开题核心目标。}
 
 \end{frame}

@@ -1,334 +1,138 @@
-\section{主要研究内容及研究方案}
-\subsection{研究内容}
+\section{已完成的主要研究工作}
 
-\begin{frame}{主要研究内容及研究方案}{研究内容 - 存储编码的基本原理}
+\subsection{原理瓶颈与优化框架}
 
-    % \textbf{存储编码的基本原理}
-
-    \begin{columns}
-
-        \column{0.5\textwidth}
-
-        \begin{block}{RS纠删码编码}
-            \footnotesize
-            \begin{itemize}
-                \item $D$：原始数据块向量
-                \item $G$：生成矩阵（Vandermonde/Cauchy）
-                \item $C$：编码后的校验块向量
-            \end{itemize}
-            $$\mathbf{C} = \mathbf{G} \times_{GF[2^w]} \mathbf{D}$$
-            原始数据均分成$k$块，通过有限域矩阵乘法编码出$m$块，共$n=k+m$块存储至$n$台机器，至多容忍$m$台故障
-        \end{block}
-
-        \column{0.5\textwidth}
-
-        \begin{figure}[htbp]
-            \centering
-            \includegraphics[width=1.05\textwidth]{figures/RS码编码举例.pdf}
-            \caption{RS码编码举例}
-        \end{figure}
-
-    \end{columns}
-    
-\end{frame}
-
-\begin{frame}{主要研究内容及研究方案}{研究内容 - 存储编码的基本原理}
-
-    % \textbf{存储编码的基本原理}
-
-    \begin{columns}
-
-        \column{0.5\textwidth}
-
-        \begin{block}{RS纠删码解码}
-            \footnotesize
-            \begin{itemize}
-                \item $D'$：未丢失数据/校验块构成的向量
-                \item $G'^{-1}$：由丢失情况构造的逆生成矩阵
-                \item $D$：解出的原始数据块向量
-            \end{itemize}
-            $$\mathbf{D} = \mathbf{G'}^{-1} \times_{GF[2^w]} \mathbf{D'}$$
-        \end{block}
-
-        \column{0.5\textwidth}
-
-        \begin{figure}[T]
-            \centering
-            \includegraphics[width=0.85\textwidth]{figures/RS码解码举例.pdf}
-            \vspace{-1em}
-            \caption{RS码解码举例}
-        \end{figure}
-
-    \end{columns}
-
-\end{frame}
-
-\begin{frame}{主要研究内容及研究方案}{研究内容 - Two-tone编解码原理}
+\begin{frame}{已完成的主要研究工作}{Two-tone编解码原理与性能瓶颈}
 
     \setbeamerfont{caption}{size=\scriptsize}
-    \vspace{-0.8em}
-    \begin{columns}
-
-        \column{0.5\textwidth}
-
-        \begin{block}{Two-tone纠删码编码}
-            \footnotesize
-            \begin{itemize}
-                \item $D$：原始数据块向量
-                \item $Z$：移位生成矩阵（Two-tone矩阵）
-                \item $C$：编码后的校验块向量
-            \end{itemize}
-            $$\mathbf{C} = \mathbf{Z} \times \mathbf{D}$$
-            \vspace{-1.5em}
-            \begin{itemize}
-                \item $D=\{D_1, D_2, \dots, D_k\}$
-                \item $C=\{C_1, C_2, \dots, C_m\}$
-                \item $z^{s_{ij}}D_j$：对$D_j$非循环移位$s_{i,j}$个单位
-            \end{itemize}
-            $$C_i = \bigoplus_{j=1}^{k} z^{s_{ij}}D_j$$
-        \end{block}
-
-        \column{0.5\textwidth}
-
-        \begin{figure}[T]
-            \centering
-            \includegraphics[width=0.8\textwidth]{Two-tone码编码举例}
-            \vspace{-1em}
-            \caption{Two-tone码编码举例}
-        \end{figure}
-
-    \end{columns}
-
-\end{frame}
-
-\begin{frame}{主要研究内容及研究方案}{研究内容 - Two-tone编解码原理}
-
-    \setbeamerfont{caption}{size=\scriptsize}
-    \vspace{-0.8em}
-    \begin{columns}
-
-        \column{0.5\textwidth}
-
-        \vspace{-2em}
-
-        \begin{block}{Two-tone纠删码解码}
-            \footnotesize
-            \begin{enumerate}
-                \item 代入：将未丢失数据块异或至校验块
-                \item 消除：从两边最外侧错开码字依次向内解出（对应双子系统），并代入校验块
-            \end{enumerate}
-        \end{block}
-
-        \column{0.5\textwidth}
-
-        \begin{figure}[T]
-            \centering
-            \includegraphics[width=0.95\textwidth]{Two-tone码丢失3个数据块的解码举例}
-            \vspace{-1em}
-            \caption{Two-tone丢失3个数据块的解码}
-        \end{figure}
-
-    \end{columns}
-
-\end{frame}
-
-\begin{frame}{主要研究内容及研究方案}{研究内容 - Two-tone编解码原理}
-    \setbeamerfont{caption}{size=\scriptsize}
-    \vspace{-1em}
-
-    \begin{columns}
-
-        \column{0.5\textwidth}
-
-        \vspace{-2em}
-
-        \begin{block}{Two-tone纠删码解码}
-            \footnotesize
-            \begin{enumerate}
-                \item 代入：将未丢失数据块异或至校验块
-                \item 消除：从一边最外侧错位向内解码（另一边对应子系统为空），并代入校验块
-                \item 重编码：用未丢失和刚解出的数据块重新编码丢失的校验块
-            \end{enumerate}
-        \end{block}
-
-        \column{0.5\textwidth}
-        
-
-        \begin{figure}[T]
-            \centering
-            \includegraphics[width=0.7\textwidth]{Two-tone码丢失2个数据块和1个校验块的解码举例}
-            \vspace{-1em}
-            \caption{丢失2数据块1校验块解码}
-        \end{figure}
-
-    \end{columns}
-
-\end{frame}
-
-\begin{frame}{主要研究内容及研究方案}{研究内容 - 优化问题描述}
-
-    \begin{block}{优化问题描述}
-
-        Two-tone纠删码在理论上具备高效性，但工程实现与优化仍面临问题：
-        \begin{itemize}
-            \item 如何统一处理所有丢失情况，实现解码和重编码的泛化，兼顾高效性
-            \item 如何提高对不同偏移量数据块和校验块的访问效率，缓解内存瓶颈
-            \item 如何针对只丢失一块的常见场景进一步优化，发挥硬件指令优势
-        \end{itemize}
-
-    \end{block}
-
-    基于以上理论和问题，本课题给出了一系列研究方案。
-
-\end{frame}
-
-\subsection{研究方案}
-
-\begin{frame}{主要研究内容及研究方案}{研究方案}
-
-    \setbeamerfont{caption}{size=\scriptsize}
-
-    \small
-    \begin{block}{统一解码抽象：Erasure-Parity Mapping}
+    \begin{columns}[T]
+        \column{0.48\textwidth}
         \footnotesize
-        将所有丢失块的数据/校验块统一抽象为Erasure结构，丢失数据块按序匹配未丢失校验块，丢失校验块匹配自己，统一处理解码与重编码，减少遍历访存次数
-    \end{block}
-
-    \begin{figure}
-        \includegraphics[width=0.9\linewidth]{Two-tone一般解码实现流程}
-        \vspace{-1em}
-        \caption{Two-tone一般解码实现流程}
-    \end{figure}
-
-    \vspace{-1em}
-
-    \begin{figure}
-        \includegraphics[width=0.9\linewidth]{Erasure-Parity Mapping统一解码实现流程}
-        \vspace{-1em}
-        \caption{Erasure-Parity Mapping统一解码实现流程}
-    \end{figure}
-
-\end{frame}
-
-\begin{frame}{主要研究内容及研究方案}{研究方案}
-
-    \begin{columns}
-
-        \column{0.5\textwidth}
-
-        \begin{block}{缓存友好的窗口划分：Cache-Friendly Window}
+        \textbf{编码}：$c_{i}[x]=\bigoplus_{j=1}^{k} d_j[x-s_{i,j}]$，移位由地址偏移实现，几乎无开销。\\[0.3em]
+        \textbf{解码}（连续可解三阶段）：代入 $\to$ 消除 $\to$ 修复。
+        \vspace{0.3em}
+        \begin{block}{瓶颈：内存受限，而非算术}
+            \footnotesize
             \begin{itemize}
-                \item 将较长的数据块（chunk）划分为更小的窗口（window）
-                \item 在窗口内首次访问时初始化
-                \item off-by-one代入策略：领先一个窗口代入以覆盖所有块的偏移
-                \item 增强局部性，提高缓存利用率
+                \item 冗余访存、时间局部性差
+                \item 横向/纵向遍历各有访存瓶颈
+                \item 解码与修复分离、统一遍历致次优
             \end{itemize}
         \end{block}
 
-        \column{0.5\textwidth}
-
-        \begin{figure}[htbp]
+        \column{0.52\textwidth}
+        \begin{figure}
             \centering
-            \includegraphics[width=1.0\textwidth]{Cache-Friendly Window效果演示}
-            \caption{Cache-Friendly Window效果演示}
+            \includegraphics[width=\textwidth,height=0.66\textheight,keepaspectratio]{Example of Two-tone Decoding.pdf}
+            \vspace{-0.6em}
+            \caption{Two-tone解码举例（$\boldsymbol d_1,\boldsymbol d_2,\boldsymbol c_2$丢失）}
         \end{figure}
-
     \end{columns}
 
 \end{frame}
 
-\begin{frame}{主要研究内容及研究方案}{研究方案}
+\begin{frame}{已完成的主要研究工作}{FastTT整体优化框架}
 
-    \setbeamerfont{caption}{size=\footnotesize}
-
-    \begin{columns}
-
-        \column{0.45\textwidth}
-
-        \begin{block}{内存友好的相邻合并访问：\\Neighbor-Merging Access}
-
-            \small
-            一般的访问模式：
-            \begin{itemize}
-                \item 横向：每次遍历一整个数据块，对校验块访问反复且不集中
-                \item 纵向：按校验块单位访问数据块单位，不同校验块单位偏移不同，对数据块访问不集中
-            \end{itemize}  
-
+    \setbeamerfont{caption}{size=\scriptsize}
+    \begin{columns}[T]
+        \column{0.42\textwidth}
+        \begin{block}{设计原则}
+            \small 以\textbf{优化内存访问行为}为核心，而非改写编码算法。
         \end{block}
+        \vspace{0.3em}
+        \footnotesize
+        \textbf{四项协同优化}
+        \begin{itemize}
+            \setlength{\itemsep}{2pt}
+            \item \textbf{EPM}：统一解码抽象
+            \item \textbf{CFWP}：缓存友好窗口划分
+            \item \textbf{NMA}：相邻合并访问
+            \item \textbf{TPS}：遍历模式选择
+        \end{itemize}
+        \vspace{0.2em}
+        编码：CFWP+NMA\quad 解码：四项全用
 
-        \column{0.55\textwidth}
-
-        \begin{figure}[htbp]
+        \column{0.58\textwidth}
+        \begin{figure}
             \centering
-            \includegraphics[width=1.05\textwidth]{Two-tone编码横向与纵向访问模式}
-            \vspace{-1em}
-            \caption{Two-tone编码横向与纵向访问模式}
+            \includegraphics[width=\textwidth]{Two-tone Optimization Overview.pdf}
+            \vspace{-0.6em}
+            \caption{FastTT整体优化框架}
         \end{figure}
-
     \end{columns}
 
 \end{frame}
 
-\begin{frame}{主要研究内容及研究方案}{研究方案}
+\subsection{四项优化与系统集成}
 
-    \setbeamerfont{caption}{size=\footnotesize}
+\begin{frame}{已完成的主要研究工作}{优化一、二：EPM 与 CFWP}
 
-    \begin{columns}
+    \footnotesize
+    \begin{columns}[T]
+        \column{0.5\textwidth}
+        \textbf{EPM：统一解码抽象}
+        \begin{itemize}
+            \item 丢失\emph{数据块}$\to$存活校验块；丢失\emph{校验块}$\to$自身
+            \item 修复融入消除，3趟$\Rightarrow$2趟，省去独立修复
+        \end{itemize}
+        \centering
+        \includegraphics[width=0.82\textwidth,height=0.36\textheight,keepaspectratio]{Erasure-Parity Mapping Decoding Demonstration.pdf}
 
         \column{0.5\textwidth}
+        \textbf{CFWP：缓存友好窗口划分}
+        \begin{itemize}
+            \item 数据块切分为定长\textbf{窗口}，窗口内完成全部移位异或，提升缓存命中
+            \item 首次访问时初始化；解码 off-by-one 领先一窗口；$W$取$\ge k{-}1$的最小2的幂
+        \end{itemize}
+        \centering
+        \includegraphics[width=0.92\textwidth,height=0.36\textheight,keepaspectratio]{Cache-Friendly Window Demonstration.pdf}
+    \end{columns}
 
-        \begin{block}{内存友好的相邻合并访问：\\Neighbor-Merging Access}
+\end{frame}
 
-            \small
-            相邻合并访存：结合横向与纵向模式
-            \begin{itemize}
-                \item 两个相邻数据块内部纵向访存并计算，结果暂存至寄存器
-                \item 合并后总体上横向访问校验块
-                \item 既加强对数据块访问的集中性，又减少对校验块的重复访问
-            \end{itemize}  
+\begin{frame}{已完成的主要研究工作}{优化三、四：NMA 与 TPS}
 
+    \footnotesize
+    \begin{columns}[T]
+        \column{0.5\textwidth}
+        \textbf{NMA：相邻合并访问}
+        \begin{itemize}
+            \item 相邻两数据块码字先在SIMD寄存器内异或，再一次写回校验块
+            \item 校验块写入理论减半 $\Theta((k{+}\tfrac{km}{2})l)$，优于横向/纵向
+        \end{itemize}
+        \centering
+        \includegraphics[width=0.92\textwidth,height=0.38\textheight,keepaspectratio]{Neighbor-Merging Access Pattern.pdf}
+
+        \column{0.5\textwidth}
+        \textbf{TPS：遍历模式选择}
+        \begin{itemize}
+            \item 针对最常见\textbf{单块丢失}：免代入与消除，一遍纵向全局异或恢复
+            \item 每码字恰访问一次，用AVX2 stream指令绕过缓存
+        \end{itemize}
+        \centering
+        \includegraphics[width=0.82\textwidth,height=0.38\textheight,keepaspectratio]{Vertical Traversal Pattern Demonstration.pdf}
+    \end{columns}
+
+\end{frame}
+
+\begin{frame}{已完成的主要研究工作}{基于Ceph的工业级集成}
+
+    将优化后的Two-tone码以插件形式集成至\textbf{Ceph v18.2.7}：
+
+    \vspace{0.5em}
+    \begin{columns}[T]
+        \column{0.5\textwidth}
+        \begin{block}{接口集成与功能验证}
+            \footnotesize 通过标准纠删码接口测试编解码正确性与性能；借助EPM应对\textbf{所有}丢失组合。
         \end{block}
-
         \column{0.5\textwidth}
-
-        \begin{figure}[htbp]
-            \centering
-            \includegraphics[width=0.9\textwidth]{Neighbor-Merging Access模式}
-            \vspace{-1em}
-            \caption{Neighbor-Merging Access模式}
-        \end{figure}
-
+        \begin{block}{集群集成与应用验证}
+            \footnotesize 用\texttt{vstart}搭建集群、创建Two-tone存储池，完成文件端到端读写。
+        \end{block}
     \end{columns}
 
-\end{frame}
+    \vspace{0.6em}
+    \centering
+    \textbf{FastTT插件可在分布式环境中稳定完成编解码与读写，具备工业级部署能力。}
 
-\begin{frame}{主要研究内容及研究方案}{研究方案}
-
-    \setbeamerfont{caption}{size=\footnotesize}
-
-    \begin{columns}
-
-        \column{0.5\textwidth}
-
-            \begin{block}{特化与泛化结合：\\Special Case Expansibility}
-
-                \footnotesize
-                \begin{itemize}
-                    \item 实际分布式存储中，多台设备同时故障的概率远低于单台设备故障
-                    \item 无需两侧错位解码，只需整体异或代入未丢失块即可恢复丢失块
-                    \item 总体对所有块只访问一次，可用AVX2的stream指令绕过缓存，进一步提速
-                \end{itemize}
-
-            \end{block}
-
-        \column{0.5\textwidth}
-
-        \begin{figure}[htbp]
-            \centering
-            \includegraphics[width=1.0\textwidth]{Two-tone解码只丢失一块的特化情况举例}
-            \caption{解码只丢失一块的特化情况举例}
-        \end{figure}
-
-    \end{columns}
-    
 \end{frame}

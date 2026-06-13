@@ -31,6 +31,9 @@
 % 使用 <hitszbeamer> 主题
 \usetheme{hitszbeamer}
 
+% 三线表（实验结果表格使用 \toprule/\midrule/\bottomrule）
+\usepackage{booktabs}
+
 % cite命令引用在右上角
 \let\citeoriginal\cite
 \renewcommand{\cite}[1]{\textsuperscript{\citeoriginal{#1}}}
@@ -69,17 +72,17 @@
   \tableofcontents[sections=all]
 }
 
-% 背景动机
+% 课题主要研究内容及进度
 \input{body/background.tex}
 
-% 文献综述
-\input{body/literature.tex}
-
-% 研究方案
+% 目前已完成的主要研究工作（原理瓶颈 + 四项系统级优化 + Ceph 集成）
 \input{body/method.tex}
 
-% 目标进度
+% 实验评估与结果
 \input{body/progress.tex}
+
+% 后期工作、困难与可行性
+\input{body/literature.tex}
 
 % \section{参考文献}
 \bibliographystyle{hitszbeamer}

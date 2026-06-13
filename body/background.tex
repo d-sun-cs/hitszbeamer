@@ -1,116 +1,50 @@
-\section{课题来源及研究目的和意义}
+\section{研究内容及进度}
 
-\subsection{课题来源}
-
-\begin{frame}{课题的来源及研究目的和意义}{课题来源}
+\begin{frame}{研究内容及进度}{研究背景与问题}
 
     \begin{columns}[T]
-
         \begin{column}{0.5\textwidth}
-
-            \textbf{存储系统的数据可靠性}
-
-            \vspace{1em}
-
-            多副本：实现简单、存储开销翻倍
-
-            纠删码：
+            \textbf{背景}
+            \footnotesize
             \begin{itemize}
-                \item 计算复杂，存储开销更小
-                \item 可靠性更高\cite{weatherspoonErasureCodingVs2002}
+                \item 纠删码以远低于多副本的存储开销提供同等可靠性，是GFS、Azure、HDFS、Ceph的核心容错技术
+                \item RS码\cite{reedPolynomialCodesCertain1960}基于有限域矩阵乘法，已有大量系统级优化（Jerasure、ISA-L、Cerasure）
+                \item Two-tone移位异或码\cite{fuTwotoneShiftXORStorage2021}仅靠移位与异或，\textbf{理论性能优于RS码}，是移位异或码SOTA
             \end{itemize}
-
-            Google FS、Win Azure和Red Hat开源Ceph等存储系统均支持纠删码
-
         \end{column}
         \begin{column}{0.5\textwidth}
-
-            \textbf{经典纠删码}
-
-            \vspace{1em}
-
-            Reed-Solomon码（RS码）\cite{reedPolynomialCodesCertain1960}：
+            \textbf{问题：理论优越但缺乏高效实现}
+            \footnotesize
             \begin{itemize}
-                \item 基于有限域$GF[2^w]$矩阵乘法
-                \item 可部分转换为异或运算\cite{lubyXORBasedErasureResilientCoding1995}
+                \item \textbf{缺少泛化性实现}：无法统一应对所有数据块/校验块丢失
+                \item \textbf{缺少系统级优化}：RS码优化因算法本质不同无法直接迁移
+                \item \textbf{缺少工业级应用}：尚未集成至Ceph等开源存储系统
             \end{itemize}
-
-            Jerasure\cite{plankJerasureLibraryFacilitating2008}、Intel ISA\cite{gajalwarExploringDataProtection2024}等RS码的优化库在工业级存储系统中应用广泛
-
+            \vspace{0.3em}
+            \begin{block}{本课题}
+                \footnotesize 以Two-tone移位异或码为对象，研究其\textbf{系统级高效实现}方法。
+            \end{block}
         \end{column}
-
     \end{columns}
 
 \end{frame}
 
-\begin{frame}{课题的来源及研究目的和意义}{课题来源}
+\begin{frame}{研究内容及进度}{研究内容与阶段进度}
 
-    \begin{columns}[T]
-
-        \begin{column}{0.5\textwidth}
-
-            \textbf{非循环移位异或纠删码}
-
-            \vspace{1em}
-
-            Two-tone Shift-XOR Codes\cite{fuTwotoneShiftXORStorage2021}：
-            \begin{itemize}
-                \item 基于非循环移位和异或运算
-                \item 理论性能优于经典RS码\cite{gongZigzagDecodableCodes2017}
-                \item 暂无实现层面的优化研究
-            \end{itemize}
-
-            % \begin{block}{非循环移位异或纠删码}
-            %     Two-tone Shift-XOR Codes\cite{fuTwotoneShiftXORStorage2021}：
-            %     \begin{itemize}
-            %         \item 基于非循环移位和异或运算
-            %         \item 理论性能优于经典RS码\cite{gongZigzagDecodableCodes2017}
-            %         \item 暂无实现层面的优化研究
-            %     \end{itemize}
-            % \end{block}
-
-        \end{column}
-
-        \begin{column}{0.5\textwidth}
-
-            \textbf{工程实现与系统优化问题}
-
-            \vspace{1em}
-
-            \begin{itemize}
-                \item \emph{缺少泛化性实现}：单一的实现难以统一处理多种丢失情况
-                \item \textit{缺少系统级优化}：无法直接应用有限域矩阵乘法的优化策略
-                \item \textit{缺少工业级应用}：暂无集成至工业级存储系统的测试和应用
-            \end{itemize}
-
-            % \begin{block}{工程实现与系统优化问题}
-            %     \begin{itemize}
-            %         \item \textit{缺少泛化性实现}：单一的实现难以统一处理多种丢失情况
-            %         \item \textit{缺少系统级优化}：无法直接应用有限域矩阵乘法的优化策略
-            %         \item \textit{缺少工业级应用}：暂无集成至工业级存储系统的测试和应用
-            %     \end{itemize}
-            % \end{block}
-
-        \end{column}
-    \end{columns}
-\end{frame}
-
-\subsection{研究的目的和意义}
-
-\begin{frame}{课题的来源及研究目的和意义}{研究的目的和意义}
-
-    \begin{block}{研究目的}
-        \begin{itemize}
-            \item 完善Two-tone纠删码功能，实现基于CPU的系统级优化方案
-            \item 集成纠删码至开源分布式存储系统Ceph，测试其可靠性和高性能
-        \end{itemize}
-    
+    \footnotesize
+    \begin{block}{主要研究内容}
+        \footnotesize
+        原理分析（明确\textbf{内存受限}瓶颈）$\to$ 四项系统级优化（EPM、CFWP、NMA、TPS）$\to$ 集成至\textbf{Ceph} $\to$ 对比/消融实验，提炼移位异或码系统优化方法论。
     \end{block}
 
-    \begin{block}{研究意义}
+    \begin{block}{阶段进度（已完成开题规划的绝大部分核心工作，成果投稿 IPDPS 2026）}
+        \footnotesize
         \begin{itemize}
-            \item 推动移位异或纠删码从算法理论到实际应用，实现更高效的纠删码
-            \item 填补位异或纠删码缺少系统级优化的空白，对齐RS码的优化研究
+            \setlength{\itemsep}{2pt}
+            \item \textbf{理论分析与方案设计（已完成）}：剖析编解码原理，设计四项优化
+            \item \textbf{高效实现与系统集成（已完成）}：约2000行C++实现\,FastTT，插件集成至Ceph v18.2.7并通过测试
+            \item \textbf{实验评估（已完成）}：多配置下编码/解码/消融/端到端实验，全面优于SOTA
+            \item \textbf{方法论总结与论文撰写（进行中）}：已投稿，后续完善实验并撰写毕业论文
         \end{itemize}
     \end{block}
 

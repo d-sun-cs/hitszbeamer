@@ -1,56 +1,70 @@
-\section{国内外研究现状及分析}
+\section{后期工作、困难与可行性}
 
-\begin{frame}{国内外研究现状及分析}
-    \textbf{RS码理论研究综述：早期奠定基础的编解码理论}
-    
-    \vspace{0.5em}
+\begin{frame}{后期工作、困难与可行性}{后期拟完成的研究工作}
 
+    核心目标已基本完成，后期以\textbf{成果深化、机理验证、方法论凝练与论文撰写}为主：
+
+    \vspace{0.4em}
     \begin{enumerate}
-        \item 由Reed和Solomon提出\cite{reedPolynomialCodesCertain1960}，基于有限域Vandermonde矩阵乘法。
-        \item Luby等人将乘法变换为异或，并使用求逆更快的Cauchy矩阵\cite{lubyXORBasedErasureResilientCoding1995}。
+        \setlength{\itemsep}{3pt}
+        \item 持续完善学术论文，依据 IPDPS 2026 审稿意见修改并补充实验
+        \item \textbf{深化四项优化生效机理的细粒度验证}（在端到端、消融之外）：\\
+        \footnotesize CFWP$\to$缓存命中率（\texttt{perf}/Cachegrind）；NMA$\to$访存量与写放大；EPM$\to$冗余访存消除；TPS$\to$单块快路径每码字访问次数；并扩展块大小/配置/丢失模式维度
+        \item \normalsize 规划\textbf{新增创新点}：将移位异或码扩展应用于 LLM 推理的 KV Cache 存储
+        \item 系统整理成果，撰写硕士毕业论文并准备答辩
     \end{enumerate}
-    
-    这种变换的RS码是目前理论最优的，也是后续实现层面优化的基础。
-
-    \vspace{0.5em}
-
-    \textbf{RS码优化研究综述：重点研究工作及其优化方案总结}
-    
-    \vspace{0.5em}
-
-    \begin{table}[]
-    \centering
-    \begin{tabular}{|c|c|}
-    \hline
-    减少矩阵中$1$的个数进而减少运算 & Zerasure\cite{zhouFastErasureCoding2020}、Cerasure\cite{wangFastAccelerationStrategies2025} \\ \hline
-    提取并复用公共异或运算表达式    & SLPEC\cite{uezatoAcceleratingXORbasedErasure2021}、Cerasure                                 \\ \hline
-    内存与缓存访问优化  & Zerasure、SLPEC、Cerasure \\ \hline
-    降低数据指针相关开销 & Cerasure                \\ \hline
-    \end{tabular}
-    \end{table}
-
-    Cerasure综合各优化策略，并提出指针开销优化，是RS码SOTA实现。
 
 \end{frame}
 
-\begin{frame}{国内外研究现状及分析}
-
-    \textbf{移位异或纠删码理论研究综述：从ZigZag到Two-tone}
-    
-    \vspace{1em}
+\begin{frame}{后期工作、困难与可行性}{新增创新点：面向 KV Cache 存储的移位异或码}
 
     \footnotesize
-    ZigZag Decodable Codes（ZD码）\cite{gongZigzagDecodableCodes2017}是较早提出的移位异或纠删码，通过移位矩阵编解码，取得比RS码更少的计算量和更高的性能，并在存储、密码学、网络等领域拓展应用。
+    \begin{columns}[T]
+        \column{0.5\textwidth}
+        \begin{block}{问题与机会}
+            \footnotesize
+            LLM推理KV Cache规模巨大（如LLaMA3-70B@128k约40\,GB），分布式缓存池（Mooncake）多用多副本、利用率低；纠删码冗余更省，但重建在\textbf{延迟关键路径}上，RS码开销大——移位异或码仅靠移位异或，配合FastTT高吞吐恰好可行。
+        \end{block}
+        \begin{block}{研究内容与收益}
+            \footnotesize
+            把纠删码定位为\textbf{“性能导向的冗余”}：替代多副本提升等效容量与命中率，故障时快速就地重建KV块、避免GPU重算，维持TTFT等SLO。
+        \end{block}
 
-    \vspace{0.5em}
+        \column{0.5\textwidth}
+        \begin{block}{进度安排}
+            \footnotesize
+            \begin{itemize}
+                \setlength{\itemsep}{3pt}
+                \item \textbf{2026.03--04}：完善论文与补充实验，凝练方法论，规划创新点
+                \item \textbf{2026.04--05}：新创新点初步研究与验证，扩展实验，整理数据
+                \item \textbf{2026.05--06}：撰写毕业论文，完善图表，准备答辩
+            \end{itemize}
+        \end{block}
+    \end{columns}
+
+\end{frame}
+
+\begin{frame}{后期工作、困难与可行性}{困难、解决方案与可行性}
 
     \footnotesize
-    Two-tone Shift-XOR Codes\cite{fuTwotoneShiftXORStorage2021}在ZD码基础上，提出改进的递增差（RID）性质\cite{fuDecodingRepairSchemes2020}、连续可解性理论\cite{chengSuccessivelySolvableShiftAdd2021}，与双子系统移位异或消除法\cite{fuTwotoneShiftXORStorage2021}，得到更规范高效的移位异或纠删码。
+    \begin{columns}[T]
+        \column{0.5\textwidth}
+        \textbf{困难 → 解决方案}
+        \begin{itemize}
+            \setlength{\itemsep}{3pt}
+            \item $(10,4)$等配置寄存器约束瓶颈 → 更灵活的码字分组/SIMD调度或AVX-512
+            \item 两块丢失优化空间有限 → 设计介于快路径与通用消除间的中间策略
+            \item 方法论通用性 → 抽象与偏移结构无关的共性，构建移位异或码族通用框架
+            \item 工程集成复杂 → 借助官方工具与单元/端到端测试保证正确性
+        \end{itemize}
 
-    \vspace{0.5em}
+        \column{0.5\textwidth}
+        \begin{block}{如期完成的可能性}
+            \footnotesize
+            已完成原理分析、四项优化、FastTT库与Ceph集成，并经完整实验验证、成果投稿IPDPS 2026。后期集中于论文完善、方法论凝练、创新点探索与毕业论文撰写，目标明确、路线清晰、基础扎实。
+            \vspace{0.3em}
+            \begin{center}\textbf{能够按期完成全部论文工作。}\end{center}
+        \end{block}
+    \end{columns}
 
-    \footnotesize
-    但目前国内外学界以及工业产品均无针对移位异或纠删码的高效实现和系统应用。
-
-        
 \end{frame}
