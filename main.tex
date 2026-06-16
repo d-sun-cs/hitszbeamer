@@ -1,6 +1,6 @@
 %%=======================================================================
 % !Mode:: "TeX:UTF-8"
-% !TEX program  = PdfLaTeX
+% !TEX program  = XeLaTeX
 %%=======================================================================
 % 模板名称：hitszbeamer
 % 模板版本：V1.1.0
@@ -38,14 +38,7 @@
 \let\citeoriginal\cite
 \renewcommand{\cite}[1]{\textsuperscript{\citeoriginal{#1}}}
 
-% 每一章节前插入目录
-\AtBeginSection[] 
-{
-  \begin{frame}
-    \frametitle{目录}
-    \tableofcontents[currentsection]
-  \end{frame}
-}
+% 15分钟中期答辩控制页数：仅保留开头总目录，不在每章前重复插入目录页。
 
 % 开始写文章
 \begin{document}
@@ -62,20 +55,20 @@
 
 % 标题页
 \begin{frame}
-		\maketitle
+			\maketitle
 \end{frame}
 
 % 目录页
 \section*{目录}
 \frame{
-  \frametitle{\secname}
+  \frametitle{汇报提纲}
   \tableofcontents[sections=all]
 }
 
 % 课题主要研究内容及进度
 \input{body/background.tex}
 
-% 目前已完成的主要研究工作（原理瓶颈 + 四项系统级优化 + Ceph 集成）
+% 目前已完成的主要研究工作（原理瓶颈 + 四项系统级优化）
 \input{body/method.tex}
 
 % 实验评估与结果
@@ -94,7 +87,7 @@
 
 % Q&A
 % \section{Q\&A}
-\begin{frame}{\secname~ }
+\begin{frame}{Q\&A}
 	\begin{center}
  		\huge {感谢各位老师的耐心观看\\请老师批评指正}\\
 		\vspace{1cm}
@@ -106,4 +99,3 @@
 
 % 结束文档撰写
 \end{document}
-

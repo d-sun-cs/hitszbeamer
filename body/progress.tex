@@ -1,15 +1,75 @@
 \section{实验评估与结果}
 
-\begin{frame}{实验评估与结果}{编码与解码吞吐}
+\begin{frame}{实验评估与结果}{Ceph集成与实验设置}
 
     \footnotesize
-    环境：i9-14900K + AVX2、64\,GB DDR5、块2\,MB；基线：Jerasure、\textbf{ISA-L}（Ceph生产级）、\textbf{Cerasure}（学术SOTA）。
-
-    \vspace{0.4em}
     \begin{columns}[T]
         \column{0.5\textwidth}
-        \begin{block}{编码吞吐（GB/s）}
-            \centering \scriptsize
+        \begin{block}{系统集成}
+            \footnotesize
+            \begin{itemize}
+                \setlength{\itemsep}{3pt}
+                \item FastTT 以插件形式集成至 \textbf{Ceph v18.2.7}
+                \item 通过标准纠删码接口测试，验证编解码正确性
+                \item 使用 \texttt{vstart}+\texttt{rados} 完成端到端读写验证
+            \end{itemize}
+        \end{block}
+        \begin{block}{评估目标}
+            \footnotesize 不只看微基准吞吐，也验证优化在真实存储系统中的可用性。
+        \end{block}
+
+        \column{0.5\textwidth}
+        \begin{block}{实验平台与基线}
+            \footnotesize
+            \begin{itemize}
+                \setlength{\itemsep}{3pt}
+                \item CPU：i9-14900K，AVX2；内存：64\,GB DDR5
+                \item 块大小：2\,MB；多组 $(k,m)$ 配置，重复运行取平均
+                \item 基线：Jerasure、\textbf{ISA-L}（Ceph生产级）、\textbf{Cerasure}（学术SOTA）
+            \end{itemize}
+        \end{block}
+        \begin{block}{评价维度}
+            \footnotesize 编码吞吐、解码吞吐、优化消融、Ceph端到端 \emph{PUT} 吞吐。
+        \end{block}
+    \end{columns}
+
+\end{frame}
+
+\begin{frame}{实验评估与结果}{核心吞吐结果}
+
+    \footnotesize
+    \begin{columns}[T]
+        \column{0.34\textwidth}
+        \begin{block}{编码}
+            \centering
+            \Large\textbf{+59.1\%}
+
+            \vspace{0.1em}
+            \scriptsize 平均优于 ISA-L；最高 +84.1\%
+        \end{block}
+        \column{0.33\textwidth}
+        \begin{block}{解码}
+            \centering
+            \Large\textbf{+50.9\%}
+
+            \vspace{0.1em}
+            \scriptsize 平均优于 ISA-L；最高 +182.1\%
+        \end{block}
+        \column{0.33\textwidth}
+        \begin{block}{学术SOTA}
+            \centering
+            \Large\textbf{+13.2\% / +16.0\%}
+
+            \vspace{0.1em}
+            \scriptsize 编码 / 解码优于 Cerasure
+        \end{block}
+    \end{columns}
+
+    \vspace{0.2em}
+    \begin{columns}[T]
+        \column{0.5\textwidth}
+        \begin{block}{代表性编码吞吐（GB/s）}
+            \centering\scriptsize
             \begin{tabular}{cccc}
                 \toprule
                 配置 & FastTT & ISA-L & Jera. \\
@@ -20,11 +80,9 @@
                 \bottomrule
             \end{tabular}
         \end{block}
-        \centering 相较ISA-L平均\textbf{+59.1\%}，Jerasure \textbf{+261\%}
-
         \column{0.5\textwidth}
-        \begin{block}{解码吞吐（GB/s）}
-            \centering \scriptsize
+        \begin{block}{代表性解码吞吐（GB/s）}
+            \centering\scriptsize
             \begin{tabular}{ccccc}
                 \toprule
                 配置 & 丢失 & FastTT & ISA-L & Jera. \\
@@ -35,11 +93,7 @@
                 \bottomrule
             \end{tabular}
         \end{block}
-        \centering 相较ISA-L平均\textbf{+50.9\%}，单块丢失最高\textbf{+182\%}
     \end{columns}
-
-    \vspace{0.4em}
-    \centering 对比学术SOTA Cerasure：编码\textbf{+13.2\%}、解码\textbf{+16.0\%}（最高+43.6\%）。
 
 \end{frame}
 
@@ -50,15 +104,15 @@
         \column{0.55\textwidth}
         \begin{block}{消融实验 $(8,3)$（GB/s）}
             \centering \scriptsize
-            \begin{tabular}{ccccrr}
+            \begin{tabular}{lcc}
                 \toprule
-                CFWP & NMA & EPM & TPS & 编码 & 解码 \\
+                实现版本 & 编码 & 解码 \\
                 \midrule
-                           &            &            &            & 13.16 & 7.54  \\
-                           &            & \checkmark &            & 13.16 & 16.85 \\
-                \checkmark &            & \checkmark &            & 23.32 & 24.10 \\
-                \checkmark & \checkmark & \checkmark &            & 31.23 & 24.10 \\
-                \checkmark & \checkmark & \checkmark & \checkmark & \textbf{32.78} & \textbf{35.23} \\
+                基线实现 & 13.16 & 7.54  \\
+                + EPM & 13.16 & 16.85 \\
+                + CFWP & 23.32 & 24.10 \\
+                + NMA & 31.23 & 24.10 \\
+                + TPS & \textbf{32.78} & \textbf{35.23} \\
                 \bottomrule
             \end{tabular}
         \end{block}
@@ -81,7 +135,9 @@
     \end{columns}
 
     \vspace{0.5em}
-    \centering
-    \textbf{编/解码、消融与端到端实验全面验证优化有效性，达成开题核心目标。}
+    \begin{block}{实验结论}
+        \centering
+        \footnotesize 微基准证明性能优势；消融实验说明优化来源可解释；Ceph端到端实验验证工程可用性。
+    \end{block}
 
 \end{frame}

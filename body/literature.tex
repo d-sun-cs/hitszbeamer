@@ -1,44 +1,35 @@
 \section{后期工作、困难与可行性}
 
-\begin{frame}{后期工作、困难与可行性}{后期拟完成的研究工作}
-
-    核心目标已基本完成，后期以\textbf{成果深化、机理验证、方法论凝练与论文撰写}为主：
-
-    \vspace{0.4em}
-    \begin{enumerate}
-        \setlength{\itemsep}{3pt}
-        \item 持续完善学术论文，依据 IPDPS 2026 审稿意见修改并补充实验
-        \item \textbf{深化四项优化生效机理的细粒度验证}（在端到端、消融之外）：\\
-        \footnotesize CFWP$\to$缓存命中率（\texttt{perf}/Cachegrind）；NMA$\to$访存量与写放大；EPM$\to$冗余访存消除；TPS$\to$单块快路径每码字访问次数；并扩展块大小/配置/丢失模式维度
-        \item \normalsize 规划\textbf{新增创新点}：将移位异或码扩展应用于 LLM 推理的 KV Cache 存储
-        \item 系统整理成果，撰写硕士毕业论文并准备答辩
-    \end{enumerate}
-
-\end{frame}
-
-\begin{frame}{后期工作、困难与可行性}{新增创新点：面向 KV Cache 存储的移位异或码}
+\begin{frame}{后期工作、困难与可行性}{当前工作与后续计划}
 
     \footnotesize
     \begin{columns}[T]
-        \column{0.5\textwidth}
-        \begin{block}{问题与机会}
-            \footnotesize
-            LLM推理KV Cache规模巨大（如LLaMA3-70B@128k约40\,GB），分布式缓存池（Mooncake）多用多副本、利用率低；纠删码冗余更省，但重建在\textbf{延迟关键路径}上，RS码开销大——移位异或码仅靠移位异或，配合FastTT高吞吐恰好可行。
-        \end{block}
-        \begin{block}{研究内容与收益}
-            \footnotesize
-            把纠删码定位为\textbf{“性能导向的冗余”}：替代多副本提升等效容量与命中率，故障时快速就地重建KV块、避免GPU重算，维持TTFT等SLO。
-        \end{block}
-
-        \column{0.5\textwidth}
-        \begin{block}{进度安排}
+        \column{0.48\textwidth}
+        \begin{block}{已完成工作}
             \footnotesize
             \begin{itemize}
                 \setlength{\itemsep}{3pt}
-                \item \textbf{2026.03--04}：完善论文与补充实验，凝练方法论，规划创新点
-                \item \textbf{2026.04--05}：新创新点初步研究与验证，扩展实验，整理数据
-                \item \textbf{2026.05--06}：撰写毕业论文，完善图表，准备答辩
+                \item 完成 Two-tone 原理分析与内存瓶颈定位
+                \item 实现约2000行 C++ FastTT 核心库
+                \item 完成 EPM、CFWP、NMA、TPS 四项优化
+                \item 集成至 Ceph 并完成对比、消融和端到端实验
+                \item 相关成果已投稿 IPDPS 2026
             \end{itemize}
+        \end{block}
+
+        \column{0.52\textwidth}
+        \begin{block}{后续重点}
+            \footnotesize
+            \begin{itemize}
+                \setlength{\itemsep}{3pt}
+                \item 补充机理验证：缓存命中率、访存量、写放大、单块快路径访问次数
+                \item 扩展实验维度：块大小、码参数、丢失模式和端到端场景
+                \item 凝练移位异或码系统优化方法论
+                \item 撰写毕业论文并准备最终答辩
+            \end{itemize}
+        \end{block}
+        \begin{block}{探索性新增创新点}
+            \footnotesize 面向 LLM 推理的 KV Cache 存储，探索用移位异或码替代多副本，在降低冗余的同时保持故障恢复延迟可控。
         \end{block}
     \end{columns}
 
@@ -48,22 +39,26 @@
 
     \footnotesize
     \begin{columns}[T]
-        \column{0.5\textwidth}
-        \textbf{困难 → 解决方案}
-        \begin{itemize}
-            \setlength{\itemsep}{3pt}
-            \item $(10,4)$等配置寄存器约束瓶颈 → 更灵活的码字分组/SIMD调度或AVX-512
-            \item 两块丢失优化空间有限 → 设计介于快路径与通用消除间的中间策略
-            \item 方法论通用性 → 抽象与偏移结构无关的共性，构建移位异或码族通用框架
-            \item 工程集成复杂 → 借助官方工具与单元/端到端测试保证正确性
-        \end{itemize}
+        \column{0.56\textwidth}
+        \begin{block}{主要困难与应对}
+            \footnotesize
+            \begin{itemize}
+                \setlength{\itemsep}{3pt}
+                \item $(10,4)$等配置受 AVX2 寄存器约束影响\quad $\to$ 更灵活的码字分组、SIMD 调度或 AVX-512 探索
+                \item 两块丢失场景提升有限\quad $\to$ 设计介于单块快路径与通用消除间的中间策略
+                \item 方法论泛化仍需论证\quad $\to$ 抽象与具体偏移结构无关的访存优化原则
+                \item KV Cache 方向存在收益不确定性\quad $\to$ 先构建小型原型，评估容量收益与恢复延迟权衡
+            \end{itemize}
+        \end{block}
 
-        \column{0.5\textwidth}
+        \column{0.44\textwidth}
         \begin{block}{如期完成的可能性}
             \footnotesize
-            已完成原理分析、四项优化、FastTT库与Ceph集成，并经完整实验验证、成果投稿IPDPS 2026。后期集中于论文完善、方法论凝练、创新点探索与毕业论文撰写，目标明确、路线清晰、基础扎实。
-            \vspace{0.3em}
-            \begin{center}\textbf{能够按期完成全部论文工作。}\end{center}
+            核心系统、Ceph 集成和主要实验均已完成，后续工作集中在补充验证、论文撰写和扩展探索，任务边界清晰、已有基础充分。
+            \vspace{0.6em}
+            \begin{center}
+                \large\textbf{能够按期完成全部论文工作。}
+            \end{center}
         \end{block}
     \end{columns}
 

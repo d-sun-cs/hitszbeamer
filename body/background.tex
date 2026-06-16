@@ -4,48 +4,75 @@
 
     \begin{columns}[T]
         \begin{column}{0.5\textwidth}
-            \textbf{背景}
-            \footnotesize
-            \begin{itemize}
-                \item 纠删码以远低于多副本的存储开销提供同等可靠性，是GFS、Azure、HDFS、Ceph的核心容错技术
-                \item RS码\cite{reedPolynomialCodesCertain1960}基于有限域矩阵乘法，已有大量系统级优化（Jerasure、ISA-L、Cerasure）
-                \item Two-tone移位异或码\cite{fuTwotoneShiftXORStorage2021}仅靠移位与异或，\textbf{理论性能优于RS码}，是移位异或码SOTA
-            \end{itemize}
+            \begin{block}{为什么需要纠删码}
+                \footnotesize
+                \begin{itemize}
+                    \setlength{\itemsep}{3pt}
+                    \item 分布式存储需要在节点/磁盘失效下保持数据可靠
+                    \item 多副本实现简单，但存储开销高；纠删码以更低冗余提供同等可靠性
+                    \item RS码\cite{reedPolynomialCodesCertain1960}成熟且广泛部署，但依赖有限域运算
+                \end{itemize}
+            \end{block}
         \end{column}
         \begin{column}{0.5\textwidth}
-            \textbf{问题：理论优越但缺乏高效实现}
-            \footnotesize
-            \begin{itemize}
-                \item \textbf{缺少泛化性实现}：无法统一应对所有数据块/校验块丢失
-                \item \textbf{缺少系统级优化}：RS码优化因算法本质不同无法直接迁移
-                \item \textbf{缺少工业级应用}：尚未集成至Ceph等开源存储系统
-            \end{itemize}
-            \vspace{0.3em}
-            \begin{block}{本课题}
-                \footnotesize 以Two-tone移位异或码为对象，研究其\textbf{系统级高效实现}方法。
+            \begin{block}{为什么关注 Two-tone}
+                \footnotesize
+                \begin{itemize}
+                    \setlength{\itemsep}{3pt}
+                    \item Two-tone移位异或码\cite{fuTwotoneShiftXORStorage2021}仅由移位和异或构成，理论性能潜力高
+                    \item 现有工作缺少覆盖全部丢失组合的泛化实现
+                    \item 尚缺少面向缓存、访存和工业系统的系统级优化
+                \end{itemize}
             \end{block}
         \end{column}
     \end{columns}
 
+    \vspace{0.6em}
+    \begin{block}{本课题定位}
+        \centering
+        \footnotesize 面向 Two-tone 码构建高效实现 FastTT：把理论上的移位异或优势转化为可部署的系统吞吐优势。
+    \end{block}
+
 \end{frame}
 
-\begin{frame}{研究内容及进度}{研究内容与阶段进度}
+\begin{frame}{研究内容及进度}{研究目标与阶段进度}
 
     \footnotesize
-    \begin{block}{主要研究内容}
-        \footnotesize
-        原理分析（明确\textbf{内存受限}瓶颈）$\to$ 四项系统级优化（EPM、CFWP、NMA、TPS）$\to$ 集成至\textbf{Ceph} $\to$ 对比/消融实验，提炼移位异或码系统优化方法论。
+    \begin{block}{研究路线}
+        \centering
+        瓶颈分析 $\to$ FastTT四项优化 $\to$ Ceph集成 $\to$ 对比/消融/端到端实验 $\to$ 方法论总结与论文撰写
     \end{block}
 
-    \begin{block}{阶段进度（已完成开题规划的绝大部分核心工作，成果投稿 IPDPS 2026）}
-        \footnotesize
-        \begin{itemize}
-            \setlength{\itemsep}{2pt}
-            \item \textbf{理论分析与方案设计（已完成）}：剖析编解码原理，设计四项优化
-            \item \textbf{高效实现与系统集成（已完成）}：约2000行C++实现\,FastTT，插件集成至Ceph v18.2.7并通过测试
-            \item \textbf{实验评估（已完成）}：多配置下编码/解码/消融/端到端实验，全面优于SOTA
-            \item \textbf{方法论总结与论文撰写（进行中）}：已投稿，后续完善实验并撰写毕业论文
-        \end{itemize}
-    \end{block}
+    \vspace{0.4em}
+    \begin{columns}[T]
+        \begin{column}{0.52\textwidth}
+            \begin{block}{开题核心目标}
+                \footnotesize
+                \begin{itemize}
+                    \setlength{\itemsep}{3pt}
+                    \item 分析 Two-tone 编解码原理与性能瓶颈
+                    \item 设计面向内存访问路径的系统级优化
+                    \item 完成 FastTT 实现并集成至 Ceph
+                    \item 通过实验验证相对 RS 与学术 SOTA 的优势
+                \end{itemize}
+            \end{block}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{block}{当前进展}
+                \footnotesize
+                \begin{itemize}
+                    \setlength{\itemsep}{3pt}
+                    \item FastTT 核心实现与 Ceph 插件已完成
+                    \item 编码、解码、消融和端到端实验已完成
+                    \item 成果已投稿 IPDPS 2026
+                    \item 正在补充机理验证并撰写毕业论文
+                \end{itemize}
+            \end{block}
+        \end{column}
+    \end{columns}
+
+    \vspace{0.3em}
+    \centering
+    \textbf{总体进度：开题规划中的核心系统与实验目标已基本完成。}
 
 \end{frame}
