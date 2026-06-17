@@ -2,6 +2,11 @@
 % !Mode:: "TeX:UTF-8"
 % !TEX program  = XeLaTeX
 %%=======================================================================
+\RequirePackage{iftex}
+\ifPDFTeX
+  \errmessage{This slide deck requires XeLaTeX. Use `latexmk -xelatex main.tex`, `make beamer`, or `xelatex main.tex`.}
+\fi
+
 % 模板名称：hitszbeamer
 % 模板版本：V1.1.0
 % 模板作者：杨敬轩（Jingxuan Yang）
@@ -40,18 +45,23 @@
 
 % 15分钟中期答辩控制页数：仅保留开头总目录，不在每章前重复插入目录页。
 
-% 开始写文章
-\begin{document}
-
-
 % 图片存放路径
 \graphicspath{{figures/}}
 
 % 封面信息
-\title[移位异或纠删码的\\高效实现研究]{移位异或纠删码的高效实现研究\\[1mm] \small 中期报告\vspace{-0.7em}}
-\author[孙铎]{学生：孙铎 \\[1mm] 导师：王强\ 副教授}
-\institute[哈尔滨工业大学（深圳）计算机科学与技术学院]{\small  哈尔滨工业大学（深圳）计算机科学与技术学院}
-\date{\small \vskip -10pt \today}
+\title[\texorpdfstring{移位异或纠删码的\\高效实现研究}{移位异或纠删码的高效实现研究}]{%
+  \texorpdfstring{移位异或纠删码的高效实现研究\\[1mm] \small 中期报告\vspace{-0.7em}}{移位异或纠删码的高效实现研究 - 中期报告}%
+}
+\author[孙铎]{%
+  \texorpdfstring{学生：孙铎 \\[1mm] 导师：王强\ 副教授}{孙铎}%
+}
+\institute[哈尔滨工业大学（深圳）计算机科学与技术学院]{%
+  \texorpdfstring{\small 哈尔滨工业大学（深圳）计算机科学与技术学院}{哈尔滨工业大学（深圳）计算机科学与技术学院}%
+}
+\date{\texorpdfstring{\small \vskip -10pt \today}{\today}}
+
+% 开始写文章
+\begin{document}
 
 % 标题页
 \begin{frame}
@@ -77,13 +87,15 @@
 % 后期工作、困难与可行性
 \input{body/literature.tex}
 
+% 中期答辩控制在 15 分钟以内，正式汇报不单独展示参考文献页。
+% 如需备份页，可取消下面注释。
 % \section{参考文献}
-\bibliographystyle{hitszbeamer}
-\begin{frame}{参考文献}
-  \tiny
-  \setlength{\bibsep}{-0.5pt}
-  \bibliography{reference}
-\end{frame}
+% \bibliographystyle{hitszbeamer}
+% \begin{frame}{参考文献}
+%   \tiny
+%   \setlength{\bibsep}{-0.5pt}
+%   \bibliography{reference}
+% \end{frame}
 
 % Q&A
 % \section{Q\&A}

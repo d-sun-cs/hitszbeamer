@@ -5,6 +5,20 @@
 
 # hitszbeamer：哈尔滨工业大学（深圳）Beamer模板
 
+## Build This Midterm Deck
+
+This deck must be compiled with **XeLaTeX** because the theme loads `ctex`
+and the Chinese font setup is not available under pdfLaTeX in this environment.
+
+```bash
+cd midterm/slides
+latexmk -xelatex main.tex
+# or
+make beamer
+```
+
+Do not use `pdflatex main.tex` for this deck.
+
 ![CTAN Version](https://img.shields.io/ctan/v/hitszbeamer.svg)
 ![GitHub Version](https://img.shields.io/github/release/YangLaTeX/hitszbeamer.svg)
 ![Repo Size](https://img.shields.io/github/repo-size/YangLaTeX/hitszbeamer.svg)

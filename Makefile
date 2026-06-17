@@ -1,7 +1,5 @@
 beamer:
 	xelatex -synctex=1 -interaction=nonstopmode main
-	bibtex main
-	xelatex -synctex=1 -interaction=nonstopmode main
 	xelatex -synctex=1 -interaction=nonstopmode main
 
 doc:
@@ -12,7 +10,7 @@ doc:
 	xelatex hitszbeamer.dtx
 
 clean:
-	rm -f *.toc *.bbl *.blg *.out *.aux *.log *.bak *.thm *.synctex.gz *.fdb_latexmk *.fls *.glo *.gls *.idx *.ilg *.ind *.nav *.snm *.hd
+	rm -f *.toc *.bbl *.blg *.out *.aux *.log *.bak *.thm *.synctex.gz *.synctex\(busy\) *.xdv *.fdb_latexmk *.fls *.glo *.gls *.idx *.ilg *.ind *.nav *.snm *.hd
 
 cleanall:
-	rm -f *.toc *.bbl *.blg *.out *.aux *.log *.bak *.thm *.synctex.gz *.fdb_latexmk *.fls *.glo *.gls *.idx *.ilg *.ind *.nav *.snm *.hd *.sty *.ins
+	rm -f *.toc *.bbl *.blg *.out *.aux *.log *.bak *.thm *.synctex.gz *.synctex\(busy\) *.xdv *.fdb_latexmk *.fls *.glo *.gls *.idx *.ilg *.ind *.nav *.snm *.hd *.sty *.ins

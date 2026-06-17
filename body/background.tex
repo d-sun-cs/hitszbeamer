@@ -1,78 +1,80 @@
 \section{研究内容及进度}
 
-\begin{frame}{研究内容及进度}{研究背景与问题}
+\begin{frame}{研究内容及进度}{研究背景与问题定位}
 
-    \begin{columns}[T]
-        \begin{column}{0.5\textwidth}
-            \begin{block}{为什么需要纠删码}
-                \footnotesize
+    \scriptsize
+    \begin{columns}[T,onlytextwidth]
+        \begin{column}{0.49\textwidth}
+            \begin{block}{分布式存储的容错需求}
                 \begin{itemize}
-                    \setlength{\itemsep}{3pt}
-                    \item 分布式存储需要在节点/磁盘失效下保持数据可靠
-                    \item 多副本实现简单，但存储开销高；纠删码以更低冗余提供同等可靠性
-                    \item RS码\cite{reedPolynomialCodesCertain1960}成熟且广泛部署，但依赖有限域运算
+                    \setlength{\itemsep}{1pt}
+                    \item 多副本可靠但空间开销高；Reed-Solomon 码高效但有限域运算较重
+                    \item Shift-XOR 码仅需移位与异或，具备更高理论性能潜力
+                \end{itemize}
+            \end{block}
+
+            \begin{block}{Two-tone 的工程缺口}
+                \begin{itemize}
+                    \setlength{\itemsep}{1pt}
+                    \item 缺少覆盖数据块/校验块丢失组合的高性能实现
+                    \item 缺少面向缓存局部性、访存路径和常见故障模式的系统优化验证
                 \end{itemize}
             \end{block}
         \end{column}
-        \begin{column}{0.5\textwidth}
-            \begin{block}{为什么关注 Two-tone}
-                \footnotesize
+
+        \begin{column}{0.51\textwidth}
+            \begin{block}{本课题目标}
+                面向 Two-tone 移位异或码构建高性能实现 \textbf{FastTT}，把理论上的移位异或优势转化为可部署的系统吞吐优势。
+            \end{block}
+
+            \begin{block}{中期阶段关注点}
                 \begin{itemize}
-                    \setlength{\itemsep}{3pt}
-                    \item Two-tone移位异或码\cite{fuTwotoneShiftXORStorage2021}仅由移位和异或构成，理论性能潜力高
-                    \item 现有工作缺少覆盖全部丢失组合的泛化实现
-                    \item 尚缺少面向缓存、访存和工业系统的系统级优化
+                    \setlength{\itemsep}{1pt}
+                    \item 从编解码流程中定位内存访问瓶颈
+                    \item 围绕访存次数、缓存局部性和单块丢失快路径设计优化
+                    \item 在 Ceph 插件和微基准中验证吞吐收益
                 \end{itemize}
             \end{block}
         \end{column}
     \end{columns}
 
-    \vspace{0.6em}
-    \begin{block}{本课题定位}
-        \centering
-        \footnotesize 面向 Two-tone 码构建高效实现 FastTT：把理论上的移位异或优势转化为可部署的系统吞吐优势。
-    \end{block}
-
 \end{frame}
 
-\begin{frame}{研究内容及进度}{研究目标与阶段进度}
+\begin{frame}{研究内容及进度}{研究目标与中期进展}
 
     \footnotesize
     \begin{block}{研究路线}
         \centering
-        瓶颈分析 $\to$ FastTT四项优化 $\to$ Ceph集成 $\to$ 对比/消融/端到端实验 $\to$ 方法论总结与论文撰写
+        原理与瓶颈分析 $\rightarrow$ 四项系统级优化 $\rightarrow$ Ceph 集成 $\rightarrow$ 对比与消融实验 $\rightarrow$ 方法论总结与论文撰写
     \end{block}
 
-    \vspace{0.4em}
+    \vspace{0.25em}
     \begin{columns}[T]
-        \begin{column}{0.52\textwidth}
-            \begin{block}{开题核心目标}
+        \begin{column}{0.50\textwidth}
+            \begin{block}{已完成工作}
                 \footnotesize
                 \begin{itemize}
-                    \setlength{\itemsep}{3pt}
-                    \item 分析 Two-tone 编解码原理与性能瓶颈
-                    \item 设计面向内存访问路径的系统级优化
-                    \item 完成 FastTT 实现并集成至 Ceph
-                    \item 通过实验验证相对 RS 与学术 SOTA 的优势
+                    \setlength{\itemsep}{2pt}
+                    \item 完成 Two-tone 编解码原理分析与内存瓶颈定位
+                    \item 实现约 2000 行 C++ FastTT 核心库
+                    \item 完成统一解码、窗口划分、相邻合并和单块快路径四项优化
+                    \item 集成至 Ceph v18.2.7 并完成端到端验证
                 \end{itemize}
             \end{block}
         \end{column}
-        \begin{column}{0.48\textwidth}
-            \begin{block}{当前进展}
+
+        \begin{column}{0.50\textwidth}
+            \begin{block}{阶段性成果}
                 \footnotesize
                 \begin{itemize}
-                    \setlength{\itemsep}{3pt}
-                    \item FastTT 核心实现与 Ceph 插件已完成
-                    \item 编码、解码、消融和端到端实验已完成
-                    \item 成果已投稿 IPDPS 2026
-                    \item 正在补充机理验证并撰写毕业论文
+                    \setlength{\itemsep}{2pt}
+                    \item 编码、解码、消融和学术基线对比实验已完成
+                    \item 相较 ISA-L、Jerasure 与 Cerasure 取得吞吐优势
+                    \item 相关成果已整理成论文并投稿 IPDPS 2026
+                    \item 后续聚焦机理验证、方法论凝练和新增创新点
                 \end{itemize}
             \end{block}
         \end{column}
     \end{columns}
-
-    \vspace{0.3em}
-    \centering
-    \textbf{总体进度：开题规划中的核心系统与实验目标已基本完成。}
 
 \end{frame}

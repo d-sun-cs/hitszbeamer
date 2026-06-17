@@ -2,141 +2,216 @@
 
 \subsection{原理瓶颈与优化框架}
 
-\begin{frame}{已完成的主要研究工作}{Two-tone编解码原理与性能瓶颈}
+\begin{frame}{已完成的主要研究工作}{Two-tone 编解码原理与内存瓶颈}
 
     \setbeamerfont{caption}{size=\scriptsize}
-    \begin{columns}[T]
-        \column{0.46\textwidth}
-        \footnotesize
-        \begin{block}{Two-tone 的基本特征}
-            \footnotesize
+    \scriptsize
+    \begin{columns}[T,onlytextwidth]
+        \column{0.40\textwidth}
+        \begin{block}{编解码过程}
             \begin{itemize}
-                \setlength{\itemsep}{2pt}
-                \item 编码仅由移位和异或构成，移位由地址偏移实现
-                \item 解码可抽象为代入、消除和修复过程
-                \item 核心瓶颈是\textbf{内存访问}，不是 XOR 算术
+                \setlength{\itemsep}{1pt}
+                \item 系统化 $(k,k+m)$ 码：前 $k$ 块为数据，后 $m$ 块为校验
+                \item 编码：将不同偏移的数据块异或到校验块
+                \item 解码：代入存活数据，连续恢复丢失数据并补齐校验块
             \end{itemize}
         \end{block}
 
-        \column{0.54\textwidth}
-        \begin{figure}
-            \centering
-            \includegraphics[width=\textwidth,height=0.50\textheight,keepaspectratio]{Example of Two-tone Decoding.pdf}
-            \vspace{-0.7em}
-            \caption{Two-tone解码举例}
-        \end{figure}
-        \vspace{-0.4em}
-        \footnotesize
-        \begin{itemize}
-            \setlength{\itemsep}{2pt}
-            \item 冗余访存和时间局部性差
-            \item 横向/纵向遍历难以同时适配所有场景
-            \item 解码与修复分离导致额外遍历
-        \end{itemize}
+        \begin{block}{瓶颈判断}
+            \begin{itemize}
+                \setlength{\itemsep}{1pt}
+                \item 移位靠地址偏移实现，算术开销很低
+                \item 直观实现反复读写校验块，瓶颈主要来自\textbf{内存访问}
+            \end{itemize}
+        \end{block}
+
+        \column{0.60\textwidth}
+        \centering
+        \scriptsize\textbf{编码示例：移位后异或生成校验块}
+
+        \includegraphics[width=0.96\textwidth,height=0.23\textheight,keepaspectratio]{Example of Two-tone Encoding.pdf}
+
+        \vspace{0.05em}
+        \scriptsize\textbf{解码示例：丢失数据块与校验块的恢复过程}
+
+        \includegraphics[width=0.96\textwidth,height=0.27\textheight,keepaspectratio]{Example of Two-tone Decoding.pdf}
     \end{columns}
 
 \end{frame}
 
-\begin{frame}[shrink=10]{已完成的主要研究工作}{FastTT整体优化框架}
+\begin{frame}{已完成的主要研究工作}{FastTT 整体优化框架}
+
+    \setbeamerfont{caption}{size=\scriptsize}
+    \begin{columns}[T,onlytextwidth]
+        \column{0.37\textwidth}
+        \begin{block}{设计原则}
+            \footnotesize
+            不改变 Two-tone 的数学结构，围绕\textbf{访存次数、缓存局部性、常见故障模式}做系统级优化。
+        \end{block}
+
+        \begin{block}{四项优化}
+            \scriptsize
+            \begin{itemize}
+                \setlength{\itemsep}{1pt}
+                \item 统一解码：同步恢复数据与校验
+                \item 窗口划分：切成缓存友好的连续窗口
+                \item 相邻合并：降低校验写放大
+                \item 快路径：单块丢失走纵向单遍恢复
+            \end{itemize}
+        \end{block}
+
+        \column{0.60\textwidth}
+        \centering
+        \includegraphics[width=0.96\textwidth,height=0.50\textheight,keepaspectratio]{Two-tone Optimization Overview.pdf}
+        \vspace{0.2em}
+        \scriptsize 编码侧：窗口划分 + 相邻合并\\
+        解码侧：统一解码 + 窗口划分 + 快路径
+    \end{columns}
+
+\end{frame}
+
+\subsection{四项系统级优化}
+
+\begin{frame}{已完成的主要研究工作}{统一解码抽象：同步恢复数据块与校验块}
+
+    \setbeamerfont{caption}{size=\scriptsize}
+    \begin{columns}[T]
+        \column{0.42\textwidth}
+        \begin{block}{核心思想与收益}
+            \footnotesize
+            \begin{itemize}
+                \setlength{\itemsep}{3pt}
+                \item 丢失数据块映射到存活校验块
+                \item 丢失校验块映射到自身结构
+                \item 每解出一个码字立即传播，同步完成数据恢复与校验修复
+                \item 省去独立的校验复制与重编码修复阶段
+                \item 主要减少内存访问，带来约 \textbf{100.2\%} 的解码提升
+            \end{itemize}
+        \end{block}
+
+        \column{0.58\textwidth}
+        \centering
+        \includegraphics[width=0.98\textwidth,height=0.58\textheight,keepaspectratio]{Erasure-Parity Mapping Decoding Demonstration.pdf}
+
+        \vspace{0.2em}
+        \scriptsize 例：$\boldsymbol d_1$、$\boldsymbol d_2$、$\boldsymbol c_2$ 丢失时的统一映射与同步修复
+    \end{columns}
+
+\end{frame}
+
+\begin{frame}{已完成的主要研究工作}{缓存友好窗口划分：提升局部性}
+
+    \setbeamerfont{caption}{size=\scriptsize}
+    \scriptsize
+    \begin{columns}[T,onlytextwidth]
+        \column{0.42\textwidth}
+        \begin{block}{为什么切窗口}
+            \begin{itemize}
+                \setlength{\itemsep}{1pt}
+                \item 长块直接遍历会频繁跨块访问
+                \item 校验块与数据块的错位访问容易破坏缓存局部性
+                \item 先处理小窗口，可把相关数据留在缓存附近
+            \end{itemize}
+        \end{block}
+
+        \begin{block}{实现要点}
+            \begin{itemize}
+                \setlength{\itemsep}{1pt}
+                \item 将每个长块划分为连续窗口
+                \item 当前窗口内完成移位异或后再进入下一个窗口
+                \item 首次访问时初始化，避免整块预清零
+            \end{itemize}
+        \end{block}
+
+        \column{0.58\textwidth}
+        \centering
+        \includegraphics[width=0.98\textwidth,height=0.58\textheight,keepaspectratio]{Cache-Friendly Window效果演示.pdf}
+
+        \vspace{0.2em}
+        \scriptsize 同色片段表示同一窗口内的局部访问，窗口间只保留必要重叠。
+    \end{columns}
+
+\end{frame}
+
+\begin{frame}{已完成的主要研究工作}{相邻合并访问：降低校验块写放大}
 
     \setbeamerfont{caption}{size=\scriptsize}
     \begin{columns}[T]
         \column{0.40\textwidth}
-        \begin{block}{设计原则}
-            \small 不改变 Two-tone 数学结构，围绕\textbf{内存访问路径}做系统级优化。
-        \end{block}
-        \vspace{0.2em}
-        \footnotesize
-        \begin{block}{四项协同优化}
+        \begin{block}{访问模式对比}
             \footnotesize
             \begin{itemize}
                 \setlength{\itemsep}{3pt}
-                \item \textbf{EPM}：统一数据/校验恢复
-                \item \textbf{CFWP}：窗口化提升缓存局部性
-                \item \textbf{NMA}：相邻块合并降低写放大
-                \item \textbf{TPS}：按丢失模式选择遍历路径
+                \item 横向遍历：数据局部性好，但校验块写入分散
+                \item 纵向遍历：校验写入集中，但重复读取数据块
+                \item 相邻合并：先在寄存器内合并相邻数据，再一次写回校验块
             \end{itemize}
         \end{block}
-        \centering
-        \footnotesize 编码侧：CFWP+NMA\quad 解码侧：四项协同
+
+        \vspace{0.2em}
+        \begin{block}{收益}
+            \footnotesize
+            校验块写入访问量由约 $km$ 降至约 $km/2$，同时保持数据块的连续读取优势。
+        \end{block}
 
         \column{0.60\textwidth}
         \centering
-        \includegraphics[width=0.88\textwidth,height=0.42\textheight,keepaspectratio]{Two-tone Optimization Overview.pdf}
-        \vspace{0.2em}
-        \scriptsize FastTT整体优化框架
+        \scriptsize\textbf{合并前：横向遍历与纵向遍历}
+
+        \vspace{0.1em}
+        \begin{minipage}{0.48\textwidth}
+            \centering
+            \includegraphics[width=0.98\textwidth,height=0.20\textheight,keepaspectratio]{Two-tone Horizontal Access Pattern-crop.pdf}
+            \scriptsize 横向遍历
+        \end{minipage}
+        \hfill
+        \begin{minipage}{0.48\textwidth}
+            \centering
+            \includegraphics[width=0.98\textwidth,height=0.20\textheight,keepaspectratio]{Two-tone Vertical Access Pattern-crop.pdf}
+            \scriptsize 纵向遍历
+        \end{minipage}
+
+        \vspace{0.45em}
+        \scriptsize\textbf{合并后：相邻数据先合并，再连续写回校验块}
+
+        \includegraphics[width=0.82\textwidth,height=0.22\textheight,keepaspectratio]{Neighbor-Merging Access Pattern-crop.pdf}
     \end{columns}
 
 \end{frame}
 
-\subsection{四项优化}
+\begin{frame}{已完成的主要研究工作}{遍历模式选择：单块丢失快路径}
 
-\begin{frame}{已完成的主要研究工作}{EPM 与 CFWP：减少冗余遍历并提升局部性}
-
-    \footnotesize
-    \begin{columns}[T]
-        \column{0.5\textwidth}
-        \begin{block}{EPM：统一解码抽象}
-            \footnotesize
+    \setbeamerfont{caption}{size=\scriptsize}
+    \scriptsize
+    \begin{columns}[T,onlytextwidth]
+        \column{0.42\textwidth}
+        \begin{block}{为什么需要特化}
             \begin{itemize}
-                \setlength{\itemsep}{2pt}
-                \item 将丢失数据块映射到存活校验块，丢失校验块映射到自身
-                \item 把校验块修复融入解码流程，省去独立 repair 遍历
+                \setlength{\itemsep}{1pt}
+                \item 大规模存储中单块丢失最常见
+                \item 完整 Two-tone 消除在该场景下开销过重
+                \item 纵向单遍路径使每个相关码字恰好访问一次
             \end{itemize}
         \end{block}
-        \centering
-        \includegraphics[width=0.84\textwidth,height=0.34\textheight,keepaspectratio]{Erasure-Parity Mapping Decoding Demonstration.pdf}
-        \vspace{0.2em}
-        \scriptsize 作用：减少冗余访存，统一处理所有丢失组合
 
-        \column{0.5\textwidth}
-        \begin{block}{CFWP：缓存友好窗口划分}
-            \footnotesize
+        \begin{block}{效果}
             \begin{itemize}
-                \setlength{\itemsep}{2pt}
-                \item 将块切分为窗口，窗口内完成相关移位异或
-                \item 首次访问时初始化，避免全量预清零带来的额外开销
+                \setlength{\itemsep}{1pt}
+                \item 单块丢失相较 ISA-L 提升超过 \textbf{130\%}
+                \item 最高提升达到 \textbf{182.1\%}
+                \item 多块丢失自动回退到统一解码与标准消除流程
             \end{itemize}
         \end{block}
+
+        \column{0.58\textwidth}
         \centering
-        \includegraphics[width=0.92\textwidth,height=0.34\textheight,keepaspectratio]{Cache-Friendly Window Demonstration.pdf}
-        \vspace{0.2em}
-        \scriptsize 作用：在数据离开缓存前完成更多有效计算
-    \end{columns}
+        \begin{minipage}[c][0.56\textheight][c]{\textwidth}
+            \centering
+            \includegraphics[width=0.98\textwidth,height=0.50\textheight,keepaspectratio]{Two-tone解码只丢失一块的特化情况举例.pdf}
+        \end{minipage}
 
-\end{frame}
-
-\begin{frame}{已完成的主要研究工作}{NMA 与 TPS：降低写放大并加速常见故障}
-
-    \footnotesize
-    \begin{columns}[T]
-        \column{0.5\textwidth}
-        \begin{block}{NMA：相邻合并访问}
-            \footnotesize
-            \begin{itemize}
-                \setlength{\itemsep}{2pt}
-                \item 相邻数据块先在 SIMD 寄存器内异或合并
-                \item 合并后再写回校验块，减少校验块写入次数
-            \end{itemize}
-        \end{block}
-        \centering
-        \includegraphics[width=0.94\textwidth,height=0.36\textheight,keepaspectratio]{Neighbor-Merging Access Pattern.pdf}
-        \vspace{0.2em}
-        \scriptsize 作用：降低写放大，提升编码端吞吐
-
-        \column{0.5\textwidth}
-        \begin{block}{TPS：遍历模式选择}
-            \footnotesize
-            \begin{itemize}
-                \setlength{\itemsep}{2pt}
-                \item 单块丢失直接走纵向单遍快路径
-                \item 避免完整代入/消除流程，每码字仅访问一次
-            \end{itemize}
-        \end{block}
-        \centering
-        \includegraphics[width=0.84\textwidth,height=0.36\textheight,keepaspectratio]{Vertical Traversal Pattern Demonstration.pdf}
-        \vspace{0.2em}
-        \scriptsize 作用：显著加速最常见的单块失效场景
+        \vspace{0.05em}
+        \scriptsize 单块丢失时通过纵向单遍异或直接恢复，无需完整消除流程。
     \end{columns}
 
 \end{frame}
