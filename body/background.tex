@@ -1,80 +1,104 @@
-\section{研究内容及进度}
+\section{研究内容与进度}
 
-\begin{frame}{研究内容及进度}{研究背景与问题定位}
+\begin{frame}{研究内容与进度}{先看一个真实问题：存储系统会丢块}
 
-    \scriptsize
     \begin{columns}[T,onlytextwidth]
-        \begin{column}{0.49\textwidth}
-            \begin{block}{分布式存储的容错需求}
+        \begin{column}{0.48\textwidth}
+            \begin{block}{为什么不能只靠三副本}
+                \footnotesize
                 \begin{itemize}
-                    \setlength{\itemsep}{1pt}
-                    \item 多副本可靠但空间开销高；Reed-Solomon 码高效但有限域运算较重
-                    \item Shift-XOR 码仅需移位与异或，具备更高理论性能潜力
-                \end{itemize}
-            \end{block}
-
-            \begin{block}{Two-tone 的工程缺口}
-                \begin{itemize}
-                    \setlength{\itemsep}{1pt}
-                    \item 缺少覆盖数据块/校验块丢失组合的高性能实现
-                    \item 缺少面向缓存局部性、访存路径和常见故障模式的系统优化验证
+                    \setlength{\itemsep}{3pt}
+                    \item 云存储、文件系统和对象存储都要容忍磁盘或节点失效
+                    \item 三副本实现简单，但 1\,TB 数据要占约 3\,TB 空间
+                    \item 纠删码把数据切成 $k$ 个数据块，再生成 $m$ 个校验块，用更低冗余恢复丢失块
                 \end{itemize}
             \end{block}
         \end{column}
 
-        \begin{column}{0.51\textwidth}
-            \begin{block}{本课题目标}
-                面向 Two-tone 移位异或码构建高性能实现 \textbf{FastTT}，把理论上的移位异或优势转化为可部署的系统吞吐优势。
+        \begin{column}{0.52\textwidth}
+            \begin{block}{本课题关心的具体场景}
+                \footnotesize
+                \begin{itemize}
+                    \setlength{\itemsep}{3pt}
+                    \item 存储系统中同时可能丢数据块，也可能丢校验块
+                    \item 编码和恢复速度越快，系统写入、修复和降级读越不容易被拖慢
+                    \item 目标是在 Ceph 这类真实系统里做出高吞吐纠删码实现
+                \end{itemize}
             \end{block}
 
-            \begin{block}{中期阶段关注点}
-                \begin{itemize}
-                    \setlength{\itemsep}{1pt}
-                    \item 从编解码流程中定位内存访问瓶颈
-                    \item 围绕访存次数、缓存局部性和单块丢失快路径设计优化
-                    \item 在 Ceph 插件和微基准中验证吞吐收益
-                \end{itemize}
+            \vspace{0.3em}
+            \begin{block}{一句话概括}
+                \centering
+                \footnotesize
+                少占空间，同时在块丢失时尽快把数据和校验都恢复回来。
             \end{block}
         \end{column}
     \end{columns}
 
 \end{frame}
 
-\begin{frame}{研究内容及进度}{研究目标与中期进展}
+\begin{frame}{研究内容与进度}{为什么选择移位异或码}
 
-    \footnotesize
-    \begin{block}{研究路线}
+    \setbeamerfont{caption}{size=\scriptsize}
+    \begin{columns}[T,onlytextwidth]
+        \column{0.42\textwidth}
+        \begin{block}{传统 Reed-Solomon 码}
+            \scriptsize
+            \begin{itemize}
+                \setlength{\itemsep}{1pt}
+                \item 可靠、成熟，Ceph 等系统已广泛使用
+                \item 编解码依赖有限域矩阵运算
+                \item 高性能实现优化复杂
+            \end{itemize}
+        \end{block}
+
+        \begin{block}{Two-tone 移位异或码}
+            \scriptsize
+            \begin{itemize}
+                \setlength{\itemsep}{1pt}
+                \item 校验块由数据块移位后异或得到
+                \item 移位可用地址偏移实现
+                \item 理论上很快，但缺少工程级高性能实现
+            \end{itemize}
+        \end{block}
+
+        \column{0.58\textwidth}
         \centering
-        原理与瓶颈分析 $\rightarrow$ 四项系统级优化 $\rightarrow$ Ceph 集成 $\rightarrow$ 对比与消融实验 $\rightarrow$ 方法论总结与论文撰写
-    \end{block}
+        \scriptsize\textbf{例：4 个数据块经过不同偏移后异或生成 3 个校验块}
 
-    \vspace{0.25em}
-    \begin{columns}[T]
-        \begin{column}{0.50\textwidth}
-            \begin{block}{已完成工作}
-                \footnotesize
-                \begin{itemize}
-                    \setlength{\itemsep}{2pt}
-                    \item 完成 Two-tone 编解码原理分析与内存瓶颈定位
-                    \item 实现约 2000 行 C++ FastTT 核心库
-                    \item 完成统一解码、窗口划分、相邻合并和单块快路径四项优化
-                    \item 集成至 Ceph v18.2.7 并完成端到端验证
-                \end{itemize}
-            \end{block}
-        \end{column}
+        \vspace{0.2em}
+        \includegraphics[width=0.96\textwidth,height=0.49\textheight,keepaspectratio]{Example of Two-tone Encoding.pdf}
+    \end{columns}
 
-        \begin{column}{0.50\textwidth}
-            \begin{block}{阶段性成果}
-                \footnotesize
-                \begin{itemize}
-                    \setlength{\itemsep}{2pt}
-                    \item 编码、解码、消融和学术基线对比实验已完成
-                    \item 相较 ISA-L、Jerasure 与 Cerasure 取得吞吐优势
-                    \item 相关成果已整理成论文并投稿 IPDPS 2026
-                    \item 后续聚焦机理验证、方法论凝练和新增创新点
-                \end{itemize}
-            \end{block}
-        \end{column}
+\end{frame}
+
+\begin{frame}{研究内容与进度}{中期已经做出了什么}
+
+    \begin{columns}[T,onlytextwidth]
+        \column{0.50\textwidth}
+        \begin{block}{已经完成的系统}
+            \footnotesize
+            \begin{itemize}
+                \setlength{\itemsep}{3pt}
+                \item 完成 Two-tone 编码、解码和修复流程分析
+                \item 实现约 2000 行 C++ FastTT 核心库
+                \item 把 FastTT 做成 Ceph v18.2.7 纠删码插件
+                \item 通过 Ceph 接口测试和集群端到端读写验证
+            \end{itemize}
+        \end{block}
+
+        \column{0.50\textwidth}
+        \begin{block}{已经得到的结果}
+            \footnotesize
+            \begin{itemize}
+                \setlength{\itemsep}{3pt}
+                \item 相较 ISA-L：编码平均提升 \textbf{59.1\%}
+                \item 相较 ISA-L：解码平均提升 \textbf{50.9\%}
+                \item 单块丢失恢复最高提升 \textbf{182.1\%}
+                \item 与学术基线 Cerasure 对比也取得整体优势
+                \item 相关成果已整理为论文并投稿 IPDPS 2026
+            \end{itemize}
+        \end{block}
     \end{columns}
 
 \end{frame}

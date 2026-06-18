@@ -1,34 +1,33 @@
-\section{实验评估与结果}
+\begin{frame}{已完成工作与结果}{结果一：编码吞吐明显高于 Ceph 现有基线}
 
-\begin{frame}{实验评估与结果}{核心编解码吞吐：Ceph 基准}
-
-    \scriptsize
     \begin{columns}[T,onlytextwidth]
-        \column{0.32\textwidth}
-        \begin{block}{实验设置}
+        \column{0.34\textwidth}
+        \begin{block}{最重要的数}
+            \centering
+            \Large\textbf{+59.1\%}
+
+            \vspace{0.2em}
+            \footnotesize 相较 Ceph 生产级基线 ISA-L 的平均编码吞吐提升
+        \end{block}
+
+        \begin{block}{实验怎么测}
+            \footnotesize
             \begin{itemize}
-                \setlength{\itemsep}{1pt}
-                \item 集成至 \textbf{Ceph v18.2.7}
-                \item Intel Core i9-14900K，AVX2
-                \item 块大小 2\,MB；每组重复 2000 次
-                \item 对比 ISA-L 与 Jerasure
+                \setlength{\itemsep}{2pt}
+                \item Ceph v18.2.7 纠删码插件
+                \item Intel Core i9-14900K，启用 AVX2
+                \item 块大小 2\,MB，每组重复 2000 次
             \end{itemize}
         \end{block}
 
-        \begin{block}{主要结论}
-            \begin{itemize}
-                \setlength{\itemsep}{1pt}
-                \item 编码相较 ISA-L 平均提升 \textbf{59.1\%}
-                \item 解码相较 ISA-L 平均提升 \textbf{50.9\%}
-                \item 单块丢失最高提升 \textbf{182.1\%}
-            \end{itemize}
-        \end{block}
-
-        \column{0.68\textwidth}
+        \column{0.66\textwidth}
         \centering
-        \textbf{编码吞吐（GB/s）}
+        \footnotesize\textbf{编码吞吐（GB/s）}
 
+        \vspace{0.4em}
         \scriptsize
+        \setlength{\tabcolsep}{7pt}
+        \renewcommand{\arraystretch}{1.15}
         \begin{tabular}{cccc}
             \toprule
             配置 & FastTT & ISA-L & Jerasure \\
@@ -40,12 +39,44 @@
             \bottomrule
         \end{tabular}
 
-        \vspace{0.35em}
-        \textbf{解码吞吐（GB/s）}
+        \vspace{0.8em}
+        \footnotesize
+        即使在 $(10,4)$ 这种对寄存器更不友好的配置下，FastTT 仍保持领先。
+    \end{columns}
 
+\end{frame}
+
+\begin{frame}{已完成工作与结果}{结果二：解码优势在单块丢失时最明显}
+
+    \begin{columns}[T,onlytextwidth]
+        \column{0.30\textwidth}
+        \begin{block}{最重要的数}
+            \centering
+            \Large\textbf{+50.9\%}
+
+            \vspace{0.15em}
+            \footnotesize 平均解码吞吐提升
+
+            \vspace{0.6em}
+            \Large\textbf{+182.1\%}
+
+            \vspace{0.15em}
+            \footnotesize 单块丢失最高提升
+        \end{block}
+
+        \begin{block}{怎么看表}
+            \footnotesize
+            丢失块数为 1 时，快路径生效；两块及以上丢失时，回到完整统一解码流程。
+        \end{block}
+
+        \column{0.70\textwidth}
+        \centering
+        \footnotesize\textbf{解码吞吐（GB/s）}
+
+        \vspace{0.25em}
         \tiny
-        \setlength{\tabcolsep}{3pt}
-        \renewcommand{\arraystretch}{0.74}
+        \setlength{\tabcolsep}{4pt}
+        \renewcommand{\arraystretch}{0.88}
         \begin{tabular}{ccccc}
             \toprule
             配置 & 丢失 & FastTT & ISA-L & Jerasure \\
@@ -68,29 +99,31 @@
 
 \end{frame}
 
-\begin{frame}{实验评估与结果}{与 Cerasure 的学术基线对比}
+\begin{frame}{已完成工作与结果}{结果三：相较学术基线 Cerasure 仍有优势}
 
-    \scriptsize
     \begin{columns}[T,onlytextwidth]
-        \column{0.32\textwidth}
-        \begin{block}{评价方式}
-            Cerasure 不直接集成 Ceph，因此按照其原始测试方法进行对比，保证与学术基线的方法一致。
+        \column{0.33\textwidth}
+        \begin{block}{对比方式}
+            \footnotesize
+            Cerasure 不直接集成 Ceph，因此按其原始测试方法对比，保证与学术基线的实验口径一致。
         \end{block}
 
         \begin{block}{结果摘要}
+            \footnotesize
             \begin{itemize}
-                \setlength{\itemsep}{1pt}
-                \item 编码吞吐平均提升 \textbf{13.2\%}
-                \item 解码吞吐平均提升 \textbf{16.0\%}
+                \setlength{\itemsep}{3pt}
+                \item 编码平均提升 \textbf{13.2\%}
+                \item 解码平均提升 \textbf{16.0\%}
                 \item 解码最高提升 \textbf{43.6\%}
-                \item 个别两块丢失场景略低，原因是无法使用单块快路径
+                \item 个别两块丢失场景略低
             \end{itemize}
         \end{block}
 
-        \column{0.68\textwidth}
+        \column{0.67\textwidth}
         \centering
-        \textbf{编码吞吐（GB/s）}
+        \scriptsize\textbf{编码吞吐（GB/s）}
 
+        \vspace{0.15em}
         \scriptsize
         \begin{tabular}{ccc}
             \toprule
@@ -103,12 +136,13 @@
             \bottomrule
         \end{tabular}
 
-        \vspace{0.6em}
-        \textbf{解码吞吐（GB/s）}
+        \vspace{0.35em}
+        \scriptsize\textbf{解码吞吐（GB/s）}
 
+        \vspace{0.15em}
         \tiny
         \setlength{\tabcolsep}{3pt}
-        \renewcommand{\arraystretch}{0.82}
+        \renewcommand{\arraystretch}{0.76}
         \begin{tabular}{cccc}
             \toprule
             配置 & 丢失 & FastTT & Cerasure \\
@@ -131,35 +165,35 @@
 
 \end{frame}
 
-\begin{frame}{实验评估与结果}{消融实验：四项优化贡献}
+\begin{frame}{已完成工作与结果}{消融实验：四个改动都带来实际收益}
 
-    \footnotesize
-    \begin{columns}[T]
-        \column{0.40\textwidth}
+    \begin{columns}[T,onlytextwidth]
+        \column{0.38\textwidth}
         \begin{block}{从原始实现到完整实现}
             \footnotesize
             \begin{itemize}
-                \setlength{\itemsep}{3pt}
-                \item 统一解码消除冗余修复访存
-                \item 缓存友好窗口提升局部性
-                \item 相邻合并访问降低校验块写放大
-                \item 单块丢失快路径进一步提升解码吞吐
+                \setlength{\itemsep}{1pt}
+                \item 边解码边修校验：解码提升约 100.2\%
+                \item 窗口划分：编解码继续提升约 43.0\%
+                \item 相邻合并：编码提升约 58.6\%
+                \item 单块快路径：解码提升约 43.5\%
             \end{itemize}
         \end{block}
 
-        \begin{block}{实验结论}
-            \footnotesize
-            每项优化都对应一个明确瓶颈，完整实现相较原始实现编码提升约 \textbf{149\%}，解码提升约 \textbf{367\%}。
+        \begin{block}{完整实现}
+            \scriptsize
+            相较原始实现，编码提升约 \textbf{149\%}，解码提升约 \textbf{367\%}。
         \end{block}
 
-        \column{0.60\textwidth}
+        \column{0.62\textwidth}
         \begin{block}{消融实验 $(8,3)$（GB/s）}
             \centering
             \scriptsize
             \setlength{\tabcolsep}{4pt}
+            \renewcommand{\arraystretch}{0.95}
             \begin{tabular}{cccccc}
                 \toprule
-                窗口 & 合并 & 统一解码 & 快路径 & 编码 & 解码 \\
+                窗口 & 合并 & 边修校验 & 快路径 & 编码 & 解码 \\
                 \midrule
                       &       &          &       & 13.16 & 7.54  \\
                       &       & \checkmark &       & 13.16 & 16.85 \\
