@@ -1,80 +1,39 @@
-\section{后期工作、困难与可行性}
+% !TEX root = ../main.tex
 
-\begin{frame}{后期工作、困难与可行性}{后面补三类证据}
+\section{后期主要工作}
 
+\begin{frame}[t]{后期主要工作}{把 FastTT 讲扎实，再用它恢复 KV Cache}
+
+    \vspace{-0.4em}
     \begin{columns}[T,onlytextwidth]
-        \column{0.30\textwidth}
-        \begin{block}{机理实验}
+        \column{0.48\textwidth}
+        \begin{block}{1. 给优化方法补直接证据}
             \footnotesize
             \begin{itemize}
                 \setlength{\itemsep}{4pt}
-                \item 缓存命中率
-                \item 内存读写次数
-                \item 单块快路径访问量
-            \end{itemize}
-        \end{block}
-
-        \column{0.30\textwidth}
-        \begin{block}{论文材料}
-            \footnotesize
-            \begin{itemize}
-                \setlength{\itemsep}{4pt}
-                \item 补充审稿相关实验
-                \item 总结实现经验
-                \item 完成毕业论文
-            \end{itemize}
-        \end{block}
-
-        \column{0.30\textwidth}
-        \begin{block}{新增方向}
-            \footnotesize
-            键值缓存（KV Cache）也需要冗余。
-
-            \vspace{0.35em}
-            探索用 FastTT 替代部分副本，提升等效缓存容量。
-        \end{block}
-
-        \begin{block}{第一步验证}
-            \footnotesize
-            比较“恢复 KV 块”和“重新预填充”的延迟边界。
-        \end{block}
-    \end{columns}
-
-\end{frame}
-
-\begin{frame}{后期工作、困难与可行性}{困难明确，完成路径清楚}
-
-    \begin{columns}[T,onlytextwidth]
-        \column{0.58\textwidth}
-        \begin{block}{难点与动作}
-            \footnotesize
-            \setlength{\tabcolsep}{3pt}
-            \renewcommand{\arraystretch}{1.35}
-            \begin{tabular}{p{0.38\linewidth}p{0.48\linewidth}}
-                \toprule
-                难点 & 后续动作 \\
-                \midrule
-                高参数配置 & 分组计算，更宽 SIMD \\
-                多块丢失 & 继续分析访问模式 \\
-                KV Cache 方向 & 小原型测恢复延迟 \\
-                \bottomrule
-            \end{tabular}
-        \end{block}
-
-        \column{0.38\textwidth}
-        \begin{block}{为什么能按期完成}
-            \footnotesize
-            \begin{itemize}
-                \setlength{\itemsep}{4pt}
-                \item 核心库已完成
-                \item Ceph 插件已完成
-                \item 主要实验已完成
-                \item 论文投稿稿已形成
+                \item 现在已有端到端吞吐和消融结果
+                \item 还要直接测：缓存命中率、实际访存次数
+                \item 目标：直观说明省掉的内存开销
             \end{itemize}
 
-            \vspace{0.3em}
+            \vspace{0.25em}
             \centering
-            \large\textbf{能够按期完成。}
+            \scriptsize 产出：补充实验图表，支撑论文修改和毕业论文。
+        \end{block}
+
+        \column{0.48\textwidth}
+        \begin{block}{2. 内存出问题时恢复 KV Cache}
+            \footnotesize
+            \begin{itemize}
+                \setlength{\itemsep}{4pt}
+                \item 大模型推理会把中间结果存在键值缓存（KV Cache）里
+                \item 节点内存故障后，重新预填充会让 GPU 再算一遍 KV，代价高
+                \item 尝试用 FastTT 解码恢复丢失的 KV，减少重新计算
+            \end{itemize}
+
+            \vspace{0.25em}
+            \centering
+            \scriptsize 先调研 Mooncake：以 KV Cache 为中心的管理方案，再做恢复延迟原型。
         \end{block}
     \end{columns}
 
