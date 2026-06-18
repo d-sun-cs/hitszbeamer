@@ -1,6 +1,8 @@
 %%=======================================================================
 % !Mode:: "TeX:UTF-8"
-% !TEX program  = XeLaTeX
+% !TEX program  = latexmk
+% Beamer needs repeated XeLaTeX runs for the outline and sidebar navigation.
+% The local .latexmkrc selects XeLaTeX and handles those reruns automatically.
 %%=======================================================================
 \RequirePackage{iftex}
 \ifPDFTeX
