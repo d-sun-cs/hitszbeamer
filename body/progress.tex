@@ -1,82 +1,52 @@
-\begin{frame}{已完成工作与结果}{结果一：编码吞吐明显高于 Ceph 现有基线}
+\begin{frame}[t]{已完成工作与结果}{结果一：Ceph/ISA-L 生产基线下编码、解码均有提升}
 
+    \setbeamerfont{caption}{size=\scriptsize}
+    \vspace{-0.55em}
+    {\scriptsize\textbf{Ceph v18.2.7 插件测试：}
+    编码平均提升 \textbf{+59.1\%}；解码平均提升 \textbf{+50.9\%}；单块丢失解码最高提升 \textbf{+182.1\%}。}
+
+    \vspace{0.15em}
+    {\tiny 配置 $(k,m)$ 表示 $k$ 个数据块、$m$ 个校验块；每个块 2\,MB，每组 2000 次。}
+
+    \vspace{0.15em}
     \begin{columns}[T,onlytextwidth]
-        \column{0.34\textwidth}
-        \begin{block}{最重要的数}
-            \centering
-            \Large\textbf{+59.1\%}
-
-            \vspace{0.2em}
-            \footnotesize 相较 Ceph 生产级基线 ISA-L 的平均编码吞吐提升
-        \end{block}
-
-        \begin{block}{实验怎么测}
-            \footnotesize
-            \begin{itemize}
-                \setlength{\itemsep}{2pt}
-                \item Ceph v18.2.7 纠删码插件
-                \item Intel Core i9-14900K，启用 AVX2
-                \item 块大小 2\,MB，每组重复 2000 次
-            \end{itemize}
-        \end{block}
-
-        \column{0.66\textwidth}
+        \column{0.36\textwidth}
         \centering
-        \footnotesize\textbf{编码吞吐（GB/s）}
+        \scriptsize\textbf{编码吞吐（GB/s）}
 
-        \vspace{0.4em}
+        \vspace{0.15em}
         \scriptsize
-        \setlength{\tabcolsep}{7pt}
-        \renewcommand{\arraystretch}{1.15}
+        \setlength{\tabcolsep}{2.5pt}
+        \renewcommand{\arraystretch}{1.05}
         \begin{tabular}{cccc}
             \toprule
             配置 & FastTT & ISA-L & Jerasure \\
             \midrule
-            (6, 2)  & \textbf{34.74} & 24.37 & 17.03 \\
-            (6, 3)  & \textbf{31.69} & 17.59 & 7.64  \\
-            (8, 3)  & \textbf{31.35} & 17.03 & 7.08  \\
-            (10, 4) & \textbf{17.59} & 13.56 & 4.58  \\
+            (6,2)  & \textbf{34.74} & 24.37 & 17.03 \\
+            (6,3)  & \textbf{31.69} & 17.59 & 7.64  \\
+            (8,3)  & \textbf{31.35} & 17.03 & 7.08  \\
+            (10,4) & \textbf{17.59} & 13.56 & 4.58  \\
             \bottomrule
         \end{tabular}
 
-        \vspace{0.8em}
-        \footnotesize
-        即使在 $(10,4)$ 这种对寄存器更不友好的配置下，FastTT 仍保持领先。
-    \end{columns}
+        \vspace{0.35em}
+        {\tiny 四组配置全部超过 ISA-L；$(10,4)$ 仍保持领先。}
 
-\end{frame}
+        \vspace{0.35em}
+        \begin{minipage}{0.98\textwidth}
+            \tiny\raggedright
+            \textbf{少数解码低于 ISA-L：}
+            两块丢失需走通用解码；$(10,4)$ 多块丢失受第 4 校验块的 2-symbol 位移影响。
+        \end{minipage}
 
-\begin{frame}{已完成工作与结果}{结果二：解码优势在单块丢失时最明显}
-
-    \begin{columns}[T,onlytextwidth]
-        \column{0.30\textwidth}
-        \begin{block}{最重要的数}
-            \centering
-            \Large\textbf{+50.9\%}
-
-            \vspace{0.15em}
-            \footnotesize 平均解码吞吐提升
-
-            \vspace{0.6em}
-            \Large\textbf{+182.1\%}
-
-            \vspace{0.15em}
-            \footnotesize 单块丢失最高提升
-        \end{block}
-
-        \begin{block}{怎么看表}
-            \footnotesize
-            丢失块数为 1 时，快路径生效；两块及以上丢失时，回到完整统一解码流程。
-        \end{block}
-
-        \column{0.70\textwidth}
+        \column{0.60\textwidth}
         \centering
-        \footnotesize\textbf{解码吞吐（GB/s）}
+        \scriptsize\textbf{解码吞吐（GB/s）}
 
-        \vspace{0.25em}
-        \tiny
-        \setlength{\tabcolsep}{4pt}
-        \renewcommand{\arraystretch}{0.88}
+        \vspace{0.15em}
+        \scriptsize
+        \setlength{\tabcolsep}{2.5pt}
+        \renewcommand{\arraystretch}{0.86}
         \begin{tabular}{ccccc}
             \toprule
             配置 & 丢失 & FastTT & ISA-L & Jerasure \\
@@ -95,36 +65,31 @@
             (10,4) & 4 & 11.53 & \textbf{13.97} & 3.69 \\
             \bottomrule
         \end{tabular}
+
     \end{columns}
 
 \end{frame}
 
-\begin{frame}{已完成工作与结果}{结果三：相较学术基线 Cerasure 仍有优势}
+\begin{frame}[t]{已完成工作与结果}{结果二：Cerasure 学术基线下编码、解码均有提升}
 
+    \setbeamerfont{caption}{size=\scriptsize}
+    \vspace{-0.55em}
+    {\scriptsize\textbf{Cerasure 原始环境测试：}
+    编码平均提升 \textbf{+13.2\%}；解码平均提升 \textbf{+16.0\%}；解码最高提升 \textbf{+43.6\%}。}
+
+    \vspace{0.15em}
+    {\tiny Cerasure 未集成 Ceph，按原始测试方法对比；配置 $(k,m)$ 表示 $k$ 个数据块、$m$ 个校验块。}
+
+    \vspace{0.15em}
     \begin{columns}[T,onlytextwidth]
-        \column{0.33\textwidth}
-        \begin{block}{对比方式}
-            \footnotesize
-            Cerasure 不直接集成 Ceph，因此按其原始测试方法对比，保证与学术基线的实验口径一致。
-        \end{block}
-
-        \begin{block}{结果摘要}
-            \footnotesize
-            \begin{itemize}
-                \setlength{\itemsep}{3pt}
-                \item 编码平均提升 \textbf{13.2\%}
-                \item 解码平均提升 \textbf{16.0\%}
-                \item 解码最高提升 \textbf{43.6\%}
-                \item 个别两块丢失场景略低
-            \end{itemize}
-        \end{block}
-
-        \column{0.67\textwidth}
+        \column{0.36\textwidth}
         \centering
         \scriptsize\textbf{编码吞吐（GB/s）}
 
         \vspace{0.15em}
         \scriptsize
+        \setlength{\tabcolsep}{4pt}
+        \renewcommand{\arraystretch}{1.05}
         \begin{tabular}{ccc}
             \toprule
             配置 & FastTT & Cerasure \\
@@ -137,12 +102,23 @@
         \end{tabular}
 
         \vspace{0.35em}
+        {\tiny 四组配置全部超过 Cerasure。}
+
+        \vspace{0.35em}
+        \begin{minipage}{0.98\textwidth}
+            \tiny\raggedright
+            \textbf{个别解码低于 Cerasure：}
+            两块丢失需走通用解码，无法使用单块直接异或快路径。
+        \end{minipage}
+
+        \column{0.60\textwidth}
+        \centering
         \scriptsize\textbf{解码吞吐（GB/s）}
 
         \vspace{0.15em}
-        \tiny
-        \setlength{\tabcolsep}{3pt}
-        \renewcommand{\arraystretch}{0.76}
+        \scriptsize
+        \setlength{\tabcolsep}{2.5pt}
+        \renewcommand{\arraystretch}{0.86}
         \begin{tabular}{cccc}
             \toprule
             配置 & 丢失 & FastTT & Cerasure \\
@@ -165,44 +141,59 @@
 
 \end{frame}
 
-\begin{frame}{已完成工作与结果}{消融实验：四个改动都带来实际收益}
+\begin{frame}[t]{已完成工作与结果}{结果三：消融实验显示四个改动均有贡献}
 
+    \setbeamerfont{caption}{size=\scriptsize}
+    \vspace{-0.55em}
+    {\scriptsize\textbf{$(8,3)$ 消融实验：}
+    完整 FastTT 相较原始实现，编码约 \textbf{+149\%}，解码约 \textbf{+367\%}。}
+
+    \vspace{0.15em}
+    {\tiny 表中 $\checkmark$ 表示启用该优化；吞吐单位为 GB/s。}
+
+    \vspace{0.15em}
     \begin{columns}[T,onlytextwidth]
-        \column{0.38\textwidth}
-        \begin{block}{从原始实现到完整实现}
-            \footnotesize
-            \begin{itemize}
-                \setlength{\itemsep}{1pt}
-                \item 边解码边修校验：解码提升约 100.2\%
-                \item 窗口划分：编解码继续提升约 43.0\%
-                \item 相邻合并：编码提升约 58.6\%
-                \item 单块快路径：解码提升约 43.5\%
-            \end{itemize}
-        \end{block}
+        \column{0.36\textwidth}
+        \centering
+        \scriptsize\textbf{单项增益}
 
-        \begin{block}{完整实现}
-            \scriptsize
-            相较原始实现，编码提升约 \textbf{149\%}，解码提升约 \textbf{367\%}。
-        \end{block}
+        \vspace{0.15em}
+        \scriptsize
+        \setlength{\tabcolsep}{6pt}
+        \renewcommand{\arraystretch}{1.12}
+        \begin{tabular}{cc}
+            \toprule
+            优化 & 提升 \\
+            \midrule
+            边修校验 & \textbf{+100.2\%} \\
+            窗口划分 & \textbf{+43.0\%}  \\
+            相邻合并 & \textbf{+58.6\%}  \\
+            单块快路径 & \textbf{+43.5\%} \\
+            \bottomrule
+        \end{tabular}
 
-        \column{0.62\textwidth}
-        \begin{block}{消融实验 $(8,3)$（GB/s）}
-            \centering
-            \scriptsize
-            \setlength{\tabcolsep}{4pt}
-            \renewcommand{\arraystretch}{0.95}
-            \begin{tabular}{cccccc}
-                \toprule
-                窗口 & 合并 & 边修校验 & 快路径 & 编码 & 解码 \\
-                \midrule
-                      &       &          &       & 13.16 & 7.54  \\
-                      &       & \checkmark &       & 13.16 & 16.85 \\
-                \checkmark &       & \checkmark &       & 23.32 & 24.10 \\
-                \checkmark & \checkmark & \checkmark &       & 31.23 & 24.10 \\
-                \checkmark & \checkmark & \checkmark & \checkmark & \textbf{32.78} & \textbf{35.23} \\
-                \bottomrule
-            \end{tabular}
-        \end{block}
+        \vspace{0.35em}
+        {\tiny 四个改动分别贡献解码流程、缓存局部性、写入次数和单块恢复路径。}
+
+        \column{0.60\textwidth}
+        \centering
+        \scriptsize\textbf{组合吞吐（GB/s）}
+
+        \vspace{0.15em}
+        \scriptsize
+        \setlength{\tabcolsep}{3.5pt}
+        \renewcommand{\arraystretch}{1.02}
+        \begin{tabular}{cccccc}
+            \toprule
+            窗口 & 合并 & 边修校验 & 快路径 & 编码 & 解码 \\
+            \midrule
+                  &       &          &       & 13.16 & 7.54  \\
+                  &       & \checkmark &       & 13.16 & 16.85 \\
+            \checkmark &       & \checkmark &       & 23.32 & 24.10 \\
+            \checkmark & \checkmark & \checkmark &       & 31.23 & 24.10 \\
+            \checkmark & \checkmark & \checkmark & \checkmark & \textbf{32.78} & \textbf{35.23} \\
+            \bottomrule
+        \end{tabular}
     \end{columns}
 
 \end{frame}

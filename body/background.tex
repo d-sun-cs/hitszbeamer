@@ -1,103 +1,135 @@
 \section{研究内容与进度}
 
-\begin{frame}{研究内容与进度}{先看一个真实问题：存储系统会丢块}
+\begin{frame}{研究内容与进度}{存储系统需要可靠且低开销的冗余}
 
     \begin{columns}[T,onlytextwidth]
-        \begin{column}{0.48\textwidth}
-            \begin{block}{为什么不能只靠三副本}
+        \begin{column}{0.47\textwidth}
+            \begin{block}{多副本：简单但占空间}
                 \footnotesize
                 \begin{itemize}
-                    \setlength{\itemsep}{3pt}
-                    \item 云存储、文件系统和对象存储都要容忍磁盘或节点失效
-                    \item 三副本实现简单，但 1\,TB 数据要占约 3\,TB 空间
-                    \item 纠删码把数据切成 $k$ 个数据块，再生成 $m$ 个校验块，用更低冗余恢复丢失块
+                    \setlength{\itemsep}{4pt}
+                    \item 数据需要冗余，才能在节点或磁盘失效后恢复
+                    \item 多副本直接保存多份数据，可靠但存储开销高
                 \end{itemize}
             \end{block}
         \end{column}
 
-        \begin{column}{0.52\textwidth}
-            \begin{block}{本课题关心的具体场景}
+        \begin{column}{0.47\textwidth}
+            \begin{block}{纠删码：用计算换空间}
                 \footnotesize
                 \begin{itemize}
-                    \setlength{\itemsep}{3pt}
-                    \item 存储系统中同时可能丢数据块，也可能丢校验块
-                    \item 编码和恢复速度越快，系统写入、修复和降级读越不容易被拖慢
-                    \item 目标是在 Ceph 这类真实系统里做出高吞吐纠删码实现
+                    \setlength{\itemsep}{4pt}
+                    \item 只保存少量校验块，也能恢复丢失数据
+                    \item 代价是写入、恢复和降级读都需要编解码计算
                 \end{itemize}
-            \end{block}
-
-            \vspace{0.3em}
-            \begin{block}{一句话概括}
-                \centering
-                \footnotesize
-                少占空间，同时在块丢失时尽快把数据和校验都恢复回来。
             \end{block}
         \end{column}
     \end{columns}
 
+    \vspace{0.7em}
+    \begin{block}{本课题的优化重点}
+        \centering
+        \footnotesize
+        让纠删码的编码、解码尽可能快，降低节省空间带来的计算代价。
+    \end{block}
+
 \end{frame}
 
-\begin{frame}{研究内容与进度}{为什么选择移位异或码}
+\begin{frame}{研究内容与进度}{为什么选择移位异或纠删码}
 
     \setbeamerfont{caption}{size=\scriptsize}
     \begin{columns}[T,onlytextwidth]
-        \column{0.42\textwidth}
-        \begin{block}{传统 Reed-Solomon 码}
+        \begin{column}{0.39\textwidth}
+        \begin{block}{Reed-Solomon 纠删码}
             \scriptsize
             \begin{itemize}
-                \setlength{\itemsep}{1pt}
-                \item 可靠、成熟，Ceph 等系统已广泛使用
-                \item 编解码依赖有限域矩阵运算
-                \item 高性能实现优化复杂
+                \setlength{\itemsep}{2pt}
+                \item 可靠、成熟，工程系统广泛使用
+                \item 编解码需要有限域矩阵运算
             \end{itemize}
         \end{block}
 
-        \begin{block}{Two-tone 移位异或码}
+        \begin{block}{移位异或纠删码}
             \scriptsize
             \begin{itemize}
-                \setlength{\itemsep}{1pt}
-                \item 校验块由数据块移位后异或得到
-                \item 移位可用地址偏移实现
-                \item 理论上很快，但缺少工程级高性能实现
+                \setlength{\itemsep}{2pt}
+                \item 移位异或计算，复杂度优于 RS
+                \item Two-tone 这一类中的 SOTA
+                \item 缺少面向存储系统的高速实现
+                \item RS 优化不能直接套用
             \end{itemize}
         \end{block}
-
-        \column{0.58\textwidth}
-        \centering
-        \scriptsize\textbf{例：4 个数据块经过不同偏移后异或生成 3 个校验块}
 
         \vspace{0.2em}
-        \includegraphics[width=0.96\textwidth,height=0.49\textheight,keepaspectratio]{Example of Two-tone Encoding.pdf}
+        \centering
+        \footnotesize\textbf{因此：对 Two-tone 做系统级优化}
+        \end{column}
+
+        \hfill
+        \begin{column}{0.55\textwidth}
+        \begin{minipage}[c][0.58\textheight][c]{\textwidth}
+            \centering
+            \scriptsize\textbf{例：4 个数据块经过不同偏移后异或生成 3 个校验块}
+
+            \vspace{0.3em}
+            \includegraphics[width=0.96\textwidth,height=0.50\textheight,keepaspectratio]{Example of Two-tone Encoding.pdf}
+        \end{minipage}
+        \end{column}
     \end{columns}
 
 \end{frame}
 
-\begin{frame}{研究内容与进度}{中期已经做出了什么}
+\begin{frame}{研究内容与进度}{中期结果：系统已落地，两个 SOTA 基线均有提升}
 
     \begin{columns}[T,onlytextwidth]
-        \column{0.50\textwidth}
-        \begin{block}{已经完成的系统}
+        \column{0.32\textwidth}
+        \begin{block}{系统落地}
             \footnotesize
             \begin{itemize}
-                \setlength{\itemsep}{3pt}
-                \item 完成 Two-tone 编码、解码和修复流程分析
-                \item 实现约 2000 行 C++ FastTT 核心库
-                \item 把 FastTT 做成 Ceph v18.2.7 纠删码插件
-                \item 通过 Ceph 接口测试和集群端到端读写验证
+                \setlength{\itemsep}{4pt}
+                \item Ceph：知名开源\\分布式存储系统
+                \item FastTT C++ 核心库（约 2000 行）
+                \item Ceph v18.2.7 纠删码插件
+                \item IPDPS 2026 投稿
             \end{itemize}
         \end{block}
 
-        \column{0.50\textwidth}
-        \begin{block}{已经得到的结果}
-            \footnotesize
-            \begin{itemize}
-                \setlength{\itemsep}{3pt}
-                \item 相较 ISA-L：编码平均提升 \textbf{59.1\%}
-                \item 相较 ISA-L：解码平均提升 \textbf{50.9\%}
-                \item 单块丢失恢复最高提升 \textbf{182.1\%}
-                \item 与学术基线 Cerasure 对比也取得整体优势
-                \item 相关成果已整理为论文并投稿 IPDPS 2026
-            \end{itemize}
+        \column{0.31\textwidth}
+        \begin{block}{Ceph/ISA-L 基线}
+            \centering
+            \scriptsize ISA-L：Ceph 官方生产级实现
+
+            \vspace{0.35em}
+            \Large\textbf{+59.1\%}
+
+            \footnotesize 编码平均提升
+
+            \vspace{0.35em}
+            \Large\textbf{+50.9\%}
+
+            \footnotesize 解码平均提升
+
+            \vspace{0.25em}
+            \scriptsize 解码最高提升 \textbf{+182.1\%}
+        \end{block}
+
+        \column{0.31\textwidth}
+        \begin{block}{Cerasure 基线}
+            \centering
+            \scriptsize 学术 SOTA；未集成 Ceph，按原环境测试
+
+            \vspace{0.35em}
+            \Large\textbf{+13.2\%}
+
+            \footnotesize 编码平均提升
+
+            \vspace{0.35em}
+            \Large\textbf{+16.0\%}
+
+            \footnotesize 解码平均提升
+
+            \vspace{0.25em}
+            \scriptsize 解码最高提升 \textbf{+43.6\%}
         \end{block}
     \end{columns}
 

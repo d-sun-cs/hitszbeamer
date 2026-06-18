@@ -3,71 +3,78 @@
 \begin{frame}{已完成工作与结果}{Two-tone 如何编码和恢复}
 
     \setbeamerfont{caption}{size=\scriptsize}
+    \vspace{-0.7em}
     \begin{columns}[T,onlytextwidth]
-        \column{0.38\textwidth}
-        \begin{block}{编码时做什么}
-            \scriptsize
-            \begin{itemize}
-                \setlength{\itemsep}{1pt}
-                \item 数据被切成 $k$ 个数据块
-                \item 每个校验块由数据块移位后异或得到
-                \item 移位靠地址偏移完成，核心计算是异或
-            \end{itemize}
-        \end{block}
+        \column{0.49\textwidth}
+        \textbf{\small 编码：移位后异或生成校验块}
 
-        \begin{block}{恢复时做什么}
-            \scriptsize
-            \begin{itemize}
-                \setlength{\itemsep}{1pt}
-                \item 先把还活着的数据代入校验块
-                \item 按 Two-tone 顺序恢复丢失数据
-                \item 如果校验块也丢了，同步补回来
-            \end{itemize}
-        \end{block}
+        \vspace{0.15em}
+        {\scriptsize 数据切成 $k$ 个数据块，按不同偏移异或得到校验块。}
 
-        \column{0.62\textwidth}
+        \vspace{0.25em}
         \centering
-        \scriptsize\textbf{解码示例：丢失两个数据块和一个校验块}
+        \includegraphics[width=1.00\textwidth,height=0.55\textheight,keepaspectratio]{Example of Two-tone Encoding.pdf}
 
-        \vspace{0.2em}
-        \includegraphics[width=0.98\textwidth,height=0.51\textheight,keepaspectratio]{Example of Two-tone Decoding.pdf}
+        \column{0.49\textwidth}
+        \textbf{\small 恢复：代入校验关系恢复丢失块}
+
+        \vspace{0.15em}
+        {\scriptsize 存活块先代入校验关系，再按 Two-tone 顺序恢复丢失数据。}
+
+        \vspace{0.25em}
+        \centering
+        \includegraphics[width=1.00\textwidth,height=0.55\textheight,keepaspectratio]{Example of Two-tone Decoding.pdf}
     \end{columns}
 
 \end{frame}
 
-\begin{frame}{已完成工作与结果}{慢在哪里：不是异或慢，而是反复搬数据}
+\begin{frame}{已完成工作与结果}{naive 实现的瓶颈主要在内存访问}
 
     \begin{columns}[T,onlytextwidth]
-        \column{0.42\textwidth}
-        \begin{block}{直观实现会做很多重复访问}
-            \footnotesize
+        \column{0.36\textwidth}
+        \begin{block}{图片里能看到的问题}
+            \scriptsize
             \begin{itemize}
                 \setlength{\itemsep}{3pt}
-                \item 编码时，一个数据块会分散写入多个校验块
-                \item 解码时，数据恢复和校验修复被分成两段流程
-                \item 同一批校验块会被多轮读写，缓存局部性差
+                \item 横向遍历：校验块分散写
+                \item 纵向遍历：数据块反复读
+                \item 长块访问：缓存局部性差
             \end{itemize}
         \end{block}
 
-        \begin{block}{FastTT 的判断}
-            \footnotesize
-            Two-tone 的异或计算很轻，真正拖慢吞吐的是内存访问次数、访问顺序和缓存命中率。
+        \begin{block}{其他问题}
+            \scriptsize
+            \begin{itemize}
+                \setlength{\itemsep}{3pt}
+                \item 解码后还要重编码修校验
+                \item 多个算子可合并，naive 实现没有合并
+            \end{itemize}
+        \end{block}
+
+        \begin{block}{优化方向}
+            \scriptsize
+            提高访存局部性，减少访存次数。
         \end{block}
 
         \column{0.58\textwidth}
         \centering
-        \scriptsize\textbf{合并前的两种访问方式都有明显瓶颈}
+        \scriptsize\textbf{naive 编码的两种访问模式}
 
         \vspace{0.2em}
-        \begin{minipage}{0.48\textwidth}
+        \begin{minipage}{\textwidth}
             \centering
-            \includegraphics[width=0.98\textwidth,height=0.32\textheight,keepaspectratio]{Two-tone Horizontal Access Pattern-crop.pdf}
+            \makebox[\textwidth][c]{%
+                \includegraphics[width=1.08\textwidth,height=0.4\textheight,keepaspectratio]{Two-tone Horizontal Access Pattern-crop.pdf}%
+            }
             \scriptsize 横向遍历：数据连续，校验分散写
         \end{minipage}
-        \hfill
-        \begin{minipage}{0.48\textwidth}
+
+        \vspace{0.35em}
+        \begin{minipage}{\textwidth}
             \centering
-            \includegraphics[width=0.98\textwidth,height=0.32\textheight,keepaspectratio]{Two-tone Vertical Access Pattern-crop.pdf}
+            \makebox[\textwidth][c]{%
+                \includegraphics[width=1.08\textwidth,height=0.35\textheight,keepaspectratio]{Two-tone Vertical Access Pattern-crop.pdf}%
+            }
             \scriptsize 纵向遍历：校验集中，数据反复读
         \end{minipage}
     \end{columns}
@@ -79,151 +86,164 @@
     \setbeamerfont{caption}{size=\scriptsize}
     \begin{columns}[T,onlytextwidth]
         \column{0.38\textwidth}
-        \begin{block}{对应四个瓶颈}
+        \begin{block}{四个改动}
             \scriptsize
-            \begin{itemize}
-                \setlength{\itemsep}{1pt}
-                \item 校验修复多跑一遍 $\Rightarrow$ 边解码边修校验
-                \item 长块跨来跨去访问 $\Rightarrow$ 切成缓存窗口
-                \item 校验块写入太分散 $\Rightarrow$ 相邻数据先合并
-                \item 单块丢失最常见 $\Rightarrow$ 单遍直接恢复
-            \end{itemize}
+            \begin{enumerate}
+                \setlength{\itemsep}{3pt}
+                \item 解出的数据块立刻去修校验块
+                \item 长块切成短块窗口（Tiling）
+                \item 相邻块先在寄存器合并再访存
+                \item 单块丢失走快速解码路径
+            \end{enumerate}
         \end{block}
 
-        \begin{block}{落地形态}
+        \begin{block}{落地结果}
             \scriptsize
-            全部集成进 FastTT，并以 Ceph 插件完成系统验证。
+            四项优化全部进入 FastTT，并通过 Ceph 插件验证。
         \end{block}
 
         \column{0.62\textwidth}
         \centering
-        \includegraphics[width=0.98\textwidth,height=0.48\textheight,keepaspectratio]{Two-tone Optimization Overview.pdf}
+        \includegraphics[width=0.98\textwidth,height=0.6\textheight,keepaspectratio]{Two-tone Optimization Overview.pdf}
 
         \vspace{0.15em}
-        \scriptsize 编码侧优化写入路径；解码侧同时减少冗余流程和常见故障开销。
+        \scriptsize 编码侧优化写入路径；\\ 解码侧同时减少冗余流程和常见故障开销。
     \end{columns}
 
 \end{frame}
 
-\begin{frame}{已完成工作与结果}{边恢复数据，边修复丢失校验}
+\begin{frame}{已完成工作与结果}{解出的数据块立刻去修校验块（Erasure-Parity Mapping）}
 
     \setbeamerfont{caption}{size=\scriptsize}
     \begin{columns}[T,onlytextwidth]
-        \column{0.36\textwidth}
+        \column{0.38\textwidth}
         \begin{block}{原来的问题}
             \scriptsize
-            解码出数据后再单独重编码修复校验块，会多访问一轮数据。
+            先解码修复数据块，再重新编码修复校验块：多跑了一遍。
         \end{block}
 
         \begin{block}{FastTT 的做法}
             \scriptsize
             \begin{itemize}
-                \setlength{\itemsep}{1pt}
-                \item 把丢失数据块映射到存活校验块
-                \item 把丢失校验块映射到自身结构
-                \item 每恢复一个码字就同步更新
-                \item 解码吞吐提升约 \textbf{100.2\%}
+                \setlength{\itemsep}{3pt}
+                \item 丢失数据块映射到存活校验块
+                \item 丢失校验块映射到自身
+                \item 图例：$d_1$、$d_2$ 解出码字后立刻用于重编码 $c_2$
             \end{itemize}
         \end{block}
 
-        \column{0.64\textwidth}
+        \column{0.62\textwidth}
         \centering
         \includegraphics[width=0.98\textwidth,height=0.55\textheight,keepaspectratio]{Erasure-Parity Mapping Decoding Demonstration.pdf}
     \end{columns}
 
 \end{frame}
 
-\begin{frame}{已完成工作与结果}{把长块切成窗口，让缓存真正用起来}
+\begin{frame}{已完成工作与结果}{长块切成短块窗口（Cache-Friendly Window Partitioning）}
 
     \setbeamerfont{caption}{size=\scriptsize}
     \begin{columns}[T,onlytextwidth]
         \column{0.38\textwidth}
         \begin{block}{原来的问题}
-            \footnotesize
-            长块直接遍历时，数据块和校验块之间来回跳转，相关数据还没用完就可能离开缓存。
+            \scriptsize
+            对校验块来回跳转访问，数据还没用完就离开缓存。
         \end{block}
 
         \begin{block}{FastTT 的做法}
-            \footnotesize
+            \scriptsize
             \begin{itemize}
                 \setlength{\itemsep}{3pt}
-                \item 把每个长块划分为连续窗口
-                \item 当前窗口内完成移位和异或
-                \item 首次访问时再初始化，避免整块预清零
+                \item 长块切成短块窗口
+                \item 窗口内完成移位和异或
+                \item 图例：同色片段在同一窗口内访问，编码解码都应用
             \end{itemize}
         \end{block}
 
         \column{0.62\textwidth}
         \centering
-        \includegraphics[width=0.98\textwidth,height=0.60\textheight,keepaspectratio]{Cache-Friendly Window效果演示.pdf}
-
-        \vspace{0.1em}
-        \scriptsize 同色片段表示同一窗口内的局部访问。
+        \includegraphics[width=0.98\textwidth,height=0.75\textheight,keepaspectratio]{Cache-Friendly Window Demonstration.pdf}
     \end{columns}
 
 \end{frame}
 
-\begin{frame}{已完成工作与结果}{相邻数据先合并，校验块少写一半}
+\begin{frame}{已完成工作与结果}{相邻块先在寄存器合并再访存（Neighbor-Merging Access）}
 
-    \setbeamerfont{caption}{size=\scriptsize}
+    \setbeamerfont{caption}{size=\tiny}
+    \vspace{-0.25em}
     \begin{columns}[T,onlytextwidth]
-        \column{0.34\textwidth}
+        \column{0.30\textwidth}
         \begin{block}{原来的问题}
             \scriptsize
-            横向遍历虽然连续读数据，但每个数据块都要分散写入多个校验块，写放大明显。
+            横向模式重复写校验块内存，纵向模式重复读数据块内存。
         \end{block}
 
         \begin{block}{FastTT 的做法}
             \scriptsize
-            相邻两个数据块先在寄存器内异或合并，再一次性写回校验块。
-        \end{block}
-
-        \begin{block}{直接结果}
-            \scriptsize
-            校验块写入访问量由约 $km$ 降至约 $km/2$。
+            \begin{itemize}
+                \setlength{\itemsep}{2pt}
+                \item 数据块码字异或结果先存到向量寄存器，再连续写回校验块内存
+                \item 注：具体实现中一个码字256位，等于AVX2向量宽度
+                \item 写入校验块内存访问减少约一半，对数据块内存也没有重复读取
+            \end{itemize}
         \end{block}
 
         \column{0.66\textwidth}
         \centering
-        \scriptsize\textbf{合并后：相邻数据合并，再连续写回校验块}
+        \begin{minipage}{0.30\linewidth}
+            \centering
+            \includegraphics[width=0.92\textwidth,height=0.24\textheight,keepaspectratio]{Two-tone Horizontal Access Pattern-crop.pdf}
 
-        \includegraphics[width=0.94\textwidth,height=0.41\textheight,keepaspectratio]{Neighbor-Merging Access Pattern-crop.pdf}
+            \vspace{-0.35em}
+            {\tiny 合并前横向：校验分散写}
+        \end{minipage}
+        \hspace{0.03\linewidth}
+        \begin{minipage}{0.54\linewidth}
+            \centering
+            \includegraphics[width=0.92\textwidth,height=0.24\textheight,keepaspectratio]{Two-tone Vertical Access Pattern-crop.pdf}
+
+            \vspace{-0.35em}
+            {\tiny 合并前纵向：数据反复读}
+        \end{minipage}
+
+        \vspace{0.15em}
+        \begin{minipage}{0.92\linewidth}
+            \centering
+            \includegraphics[width=0.98\textwidth,height=0.48\textheight,keepaspectratio]{Neighbor-Merging Access Pattern-crop.pdf}
+
+            \vspace{-0.35em}
+            {\tiny 合并后：相邻数据先合并，再连续写回校验块}
+        \end{minipage}
     \end{columns}
 
 \end{frame}
 
-\begin{frame}{已完成工作与结果}{单块丢失最常见，直接走快路径}
+\begin{frame}{已完成工作与结果}{单块丢失走快速解码路径（Traversal Pattern Selection）}
 
     \setbeamerfont{caption}{size=\scriptsize}
     \begin{columns}[T,onlytextwidth]
-        \column{0.38\textwidth}
-        \begin{block}{为什么值得单独优化}
-            \footnotesize
+        \column{0.35\textwidth}
+        \begin{block}{原来的问题}
+            \scriptsize
+            仅单块丢失很常见，且解码单块计算简单（和编码单个块几乎一样），有很大优化潜力
+        \end{block}
+
+        \begin{block}{FastTT 的做法}
+            \scriptsize
             \begin{itemize}
-                \setlength{\itemsep}{3pt}
-                \item 大规模存储中单块失效最常见
-                \item 单块丢失不需要完整 Two-tone 消除
-                \item 直接对相关存活块做一遍异或即可恢复
+                \setlength{\itemsep}{2pt}
+                \item 单块丢失选择纵向遍历
+                \item 存活块异或一遍即可恢复
+                \item 图例：缺失块一次异或得到
             \end{itemize}
         \end{block}
 
-        \begin{block}{直接结果}
-            \footnotesize
-            \begin{itemize}
-                \setlength{\itemsep}{3pt}
-                \item 单块丢失相较 ISA-L 提升超过 \textbf{130\%}
-                \item 最高提升达到 \textbf{182.1\%}
-            \end{itemize}
-        \end{block}
-
-        \column{0.62\textwidth}
+        \column{0.6\textwidth}
         \centering
         \begin{minipage}[c][0.60\textheight][c]{\textwidth}
             \centering
-            \includegraphics[width=0.98\textwidth,height=0.54\textheight,keepaspectratio]{Two-tone解码只丢失一块的特化情况举例.pdf}
+            \includegraphics[width=0.98\textwidth,height=0.65\textheight,keepaspectratio]{Vertical Traversal Pattern Demonstration.pdf}
         \end{minipage}
 
-        \scriptsize 多块丢失时自动回到标准统一解码流程。
     \end{columns}
 
 \end{frame}

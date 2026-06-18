@@ -1,76 +1,75 @@
 \section{后期工作、困难与可行性}
 
-\begin{frame}{后期工作、困难与可行性}{后面还要补什么证据}
+\begin{frame}{后期工作、困难与可行性}{后面补三类证据}
 
     \begin{columns}[T,onlytextwidth]
-        \column{0.52\textwidth}
-        \begin{block}{围绕现有 FastTT 补机理实验}
-            \scriptsize
+        \column{0.30\textwidth}
+        \begin{block}{机理实验}
+            \footnotesize
             \begin{itemize}
-                \setlength{\itemsep}{1pt}
-                \item 测缓存命中率：解释窗口划分收益
-                \item 统计内存读写次数：量化写放大下降
-                \item 对比“解码后再修复”和“边解码边修复”
-                \item 统计单块快路径的每码字访问次数
+                \setlength{\itemsep}{4pt}
+                \item 缓存命中率
+                \item 内存读写次数
+                \item 单块快路径访问量
             \end{itemize}
         \end{block}
 
-        \begin{block}{围绕论文和毕业设计补材料}
-            \scriptsize
+        \column{0.30\textwidth}
+        \begin{block}{论文材料}
+            \footnotesize
             \begin{itemize}
-                \setlength{\itemsep}{1pt}
-                \item 根据论文审稿意见补充实验和分析
-                \item 整理面向移位异或码实现的经验总结
-                \item 完成毕业论文正文与最终答辩材料
+                \setlength{\itemsep}{4pt}
+                \item 补充审稿相关实验
+                \item 总结实现经验
+                \item 完成毕业论文
             \end{itemize}
         \end{block}
 
-        \column{0.48\textwidth}
-        \begin{block}{新增创新点方向}
-            \scriptsize
-            大语言模型推理会产生大量键值缓存（KV Cache）。现有缓存池常用多副本保证可用性，占用内存高。
+        \column{0.30\textwidth}
+        \begin{block}{新增方向}
+            \footnotesize
+            键值缓存（KV Cache）也需要冗余。
 
-            \vspace{0.25em}
-            后续探索用 FastTT 的高吞吐纠删冗余替代部分副本，在控制恢复延迟的同时提升等效缓存容量。
+            \vspace{0.35em}
+            探索用 FastTT 替代部分副本，提升等效缓存容量。
         \end{block}
 
         \begin{block}{第一步验证}
-            \scriptsize
-            做小规模原型，比较“恢复 KV 块”和“重新预填充计算”的延迟边界。
+            \footnotesize
+            比较“恢复 KV 块”和“重新预填充”的延迟边界。
         \end{block}
     \end{columns}
 
 \end{frame}
 
-\begin{frame}{后期工作、困难与可行性}{困难已经明确，后续工作边界清楚}
+\begin{frame}{后期工作、困难与可行性}{困难明确，完成路径清楚}
 
     \begin{columns}[T,onlytextwidth]
-        \column{0.62\textwidth}
-        \begin{block}{主要困难与对应动作}
+        \column{0.58\textwidth}
+        \begin{block}{难点与动作}
             \footnotesize
-            \begin{itemize}
-                \setlength{\itemsep}{3pt}
-                \item $(10,4)$ 配置受 AVX2 寄存器数量影响
-                \quad $\Rightarrow$ 尝试更灵活的分组和更宽向量指令
-                \item 两块丢失场景无法使用单块快路径
-                \quad $\Rightarrow$ 分析访问模式，寻找中间优化策略
-                \item 当前优化主要围绕 Two-tone 结构
-                \quad $\Rightarrow$ 抽取与具体偏移矩阵无关的通用部分
-                \item 键值缓存方向仍有收益不确定性
-                \quad $\Rightarrow$ 先验证条带粒度、恢复延迟和缓存命中收益
-            \end{itemize}
+            \setlength{\tabcolsep}{3pt}
+            \renewcommand{\arraystretch}{1.35}
+            \begin{tabular}{p{0.38\linewidth}p{0.48\linewidth}}
+                \toprule
+                难点 & 后续动作 \\
+                \midrule
+                高参数配置 & 分组计算，更宽 SIMD \\
+                多块丢失 & 继续分析访问模式 \\
+                KV Cache 方向 & 小原型测恢复延迟 \\
+                \bottomrule
+            \end{tabular}
         \end{block}
 
         \column{0.38\textwidth}
         \begin{block}{为什么能按期完成}
             \footnotesize
             \begin{itemize}
-                \setlength{\itemsep}{3pt}
-                \item 核心算法实现已完成
-                \item Ceph 插件和正确性测试已完成
-                \item 编码、解码、消融和基线对比实验已完成
-                \item 论文投稿材料已经形成
-                \item 后续主要是补证据、写论文和做新增方向原型
+                \setlength{\itemsep}{4pt}
+                \item 核心库已完成
+                \item Ceph 插件已完成
+                \item 主要实验已完成
+                \item 论文投稿稿已形成
             \end{itemize}
 
             \vspace{0.3em}
