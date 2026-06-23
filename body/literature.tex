@@ -2,39 +2,33 @@
 
 \section{后期主要工作}
 
-\begin{frame}[t]{后期主要工作}{把 FastTT 讲扎实，再用它恢复 KV Cache}
+\begin{frame}[t]{后期主要工作}{补足已有结果，再扩展小覆盖写增量更新}
 
     \vspace{-0.4em}
-    \begin{columns}[T,onlytextwidth]
-        \column{0.48\textwidth}
-        \begin{block}{1. 给优化方法补直接证据}
-            \footnotesize
-            \begin{itemize}
-                \setlength{\itemsep}{4pt}
-                \item 现在已有端到端吞吐和消融结果
-                \item 还要直接测：缓存命中率、实际访存次数
-                \item 目标：直观说明省掉的内存开销
-            \end{itemize}
+    \begin{block}{1. 给 FastTT 优化补直接证据}
+        \footnotesize
+        \begin{itemize}
+            \setlength{\itemsep}{2pt}
+            \item 在已有吞吐和消融结果外，补测缓存命中率、实际访存次数。
+            \item 目标：把“为什么省内存开销”讲清楚，支撑论文整理。
+        \end{itemize}
+    \end{block}
 
-            \vspace{0.25em}
-            \centering
-            \scriptsize 产出：补充实验图表，支撑论文修改和毕业论文。
-        \end{block}
+    \vspace{0.35em}
 
-        \column{0.48\textwidth}
-        \begin{block}{2. 内存出问题时恢复 KV Cache}
-            \footnotesize
-            \begin{itemize}
-                \setlength{\itemsep}{4pt}
-                \item 大模型推理会把中间结果存在键值缓存（KV Cache）里
-                \item 节点内存故障后，重新预填充会让 GPU 再算一遍 KV，代价高
-                \item 尝试用 FastTT 解码恢复丢失的 KV，减少重新计算
-            \end{itemize}
+    \begin{block}{2. 小规模覆盖写场景下的增量更新}
+        \footnotesize
+        \begin{itemize}
+            \setlength{\itemsep}{3pt}
+            \item （新场景）已有对象只改一小段：计算变化量$\Delta$，只更新受影响数据段和校验段。
+            \item 挑战一：连续写入要映射到移位后的校验区间，需解决边界和内存对齐问题。
+            \item 挑战二：增量更新不一定比完整重新编码快，需要选择策略。
+            \item 挑战三：RS码也能通过有限域运算更新，要探索如何定位性能瓶颈并取得优势。
+        \end{itemize}
 
-            \vspace{0.25em}
-            \centering
-            \scriptsize 先调研 Mooncake：以 KV Cache 为中心的管理方案，再做恢复延迟原型。
-        \end{block}
-    \end{columns}
+        \vspace{0.2em}
+        \centering
+        \scriptsize 产出：局部增量更新模型、性能瓶颈分析、实验结果验证。
+    \end{block}
 
 \end{frame}

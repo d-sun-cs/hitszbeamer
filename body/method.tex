@@ -2,7 +2,7 @@
 
 \section{已完成工作与结果}
 
-\begin{frame}{已完成工作与结果}{Two-tone 如何编码和恢复}
+\begin{frame}{已完成工作与结果}{Two-tone 如何编码和解码}
 
     \setbeamerfont{caption}{size=\scriptsize}
     \vspace{-0.7em}
@@ -18,7 +18,7 @@
         \includegraphics[width=1.00\textwidth,height=0.55\textheight,keepaspectratio]{Example of Two-tone Encoding.pdf}
 
         \column{0.49\textwidth}
-        \textbf{\small 恢复：代入校验关系恢复丢失块}
+        \textbf{\small 解码：代入校验关系恢复丢失块}
 
         \vspace{0.15em}
         {\scriptsize 存活块先代入校验关系，再按 Two-tone 顺序恢复丢失数据。}
@@ -92,9 +92,9 @@
             \scriptsize
             \begin{enumerate}
                 \setlength{\itemsep}{3pt}
-                \item 解出的数据块立刻去修校验块
                 \item 长块切成短块窗口（Tiling）
                 \item 相邻块先在寄存器合并再访存
+                \item 解出的数据块立刻去修校验块
                 \item 单块丢失走快速解码路径
             \end{enumerate}
         \end{block}
